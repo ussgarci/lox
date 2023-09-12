@@ -26,8 +26,8 @@ run :: String -> IO ()
 run xs = do 
   let scannerResults = scanTokens xs
   case scannerResults of 
-    Just tokens -> putStrLn (show tokens) 
-    Nothing     -> putStrLn "Error!"
+    tokens -> putStrLn (show tokens) 
+    -- TODO: print each token on newline
 
 main :: IO ()
 main = do

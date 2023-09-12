@@ -36,45 +36,47 @@ data Error = Error
   }
   deriving (Show)
 
-data ScannerState = ScannerState 
-  { currentLine :: Int
-  }
+-- data ScannerState = ScannerState 
+--   { currentLine :: Int
+--   }
 
-scanTokens :: String -> Maybe [Token]
-scanTokens xs = go (lines xs) 0
-  where
-    go :: [String] -> Int -> Maybe [Token]
-    go [] _ = Just []
-    go (currLine:xss) x = case scanLine currLine x of 
-      Nothing     -> Nothing
-      tokens -> tokens <> (go xss (x+1))
+scanTokens :: String -> [Either Error Token]
+scanTokens xs = scanLines (lines xs) 0
 
-scanLine :: String -> Int -> Maybe [Token]
-scanLine [] _ = Just []
-scanLine xs x = case scanToken xs x of 
-  Just (token, xs') -> fmap ((:) token) (scanLine xs' x)
-  Nothing           -> Nothing
+scanLines :: [String] -> Int -> [Either Error Token]
+scanLines [] _ = []
+scanLines (xs:xss) lineNum = (scanLine xs lineNum) <> (scanLines xss (lineNum +1))
 
-scanToken :: String -> Int -> Maybe (Token, String)
-scanToken ('<':'=':xs) x = Just $ (Token LESS_EQUAL "<=" x, xs)
-scanToken ('>':'=':xs) x = Just $ (Token GREATER_EQUAL ">=" x, xs)
-scanToken ('=':'=':xs) x = Just $ (Token EQUAL_EQUAL "==" x, xs)
-scanToken ('!':'=':xs) x = Just $ (Token BANG_EQUAL "!=" x, xs)
-scanToken ('<':xs) x = Just $ (Token LESS "<" x, xs)
-scanToken ('>':xs) x = Just $ (Token GREATER ">" x, xs)
-scanToken ('=':xs) x = Just $ (Token EQUAL "=" x, xs)
-scanToken ('!':xs) x = Just $ (Token BANG "!" x, xs)
-scanToken ('(':xs) x = Just $ (Token LEFT_PAREN "(" x, xs)
-scanToken (')':xs) x = Just $ (Token RIGHT_PAREN ")" x, xs)
-scanToken ('{':xs) x = Just $ (Token LEFT_BRACE "{" x, xs)
-scanToken ('}':xs) x = Just $ (Token RIGHT_BRACE "}" x, xs)
-scanToken (',':xs) x = Just $ (Token COMMA "," x, xs)
-scanToken ('.':xs) x = Just $ (Token DOT "." x, xs)
-scanToken ('-':xs) x = Just $ (Token MINUS "-" x, xs)
-scanToken ('+':xs) x = Just $ (Token PLUS "+" x, xs)
-scanToken (';':xs) x = Just $ (Token SEMICOLON ";" x, xs)
-scanToken ('*':xs) x = Just $ (Token STAR "*" x, xs)
-scanToken _ _ = Nothing
+
+scanLine :: String -> Int -> [Either Error Token]
+scanLine [] _ = []
+scanLine ('/':'/':_) _ = []
+scanLine (' ':xs) x = scanLine xs x
+scanLine xs x = token : scanLine xs' x 
+  where (token, xs') = scanToken xs x 
+
+scanToken :: String -> Int -> (Either Error Token, String)
+scanToken ('<':'=':xs) x = (Right $ Token LESS_EQUAL "<=" x, xs)
+scanToken ('>':'=':xs) x = (Right $ Token GREATER_EQUAL ">=" x, xs)
+scanToken ('=':'=':xs) x = (Right $ Token EQUAL_EQUAL "==" x, xs)
+scanToken ('!':'=':xs) x = (Right $ Token BANG_EQUAL "!=" x, xs)
+scanToken ('<':xs) x = (Right $ Token LESS "<" x, xs)
+scanToken ('/':xs) x = (Right $ Token SLASH "/" x, xs)
+scanToken ('>':xs) x = (Right $ Token GREATER ">" x, xs)
+scanToken ('=':xs) x = (Right $ Token EQUAL "=" x, xs)
+scanToken ('!':xs) x = (Right $ Token BANG "!" x, xs)
+scanToken ('(':xs) x = (Right $ Token LEFT_PAREN "(" x, xs)
+scanToken (')':xs) x = (Right $ Token RIGHT_PAREN ")" x, xs)
+scanToken ('{':xs) x = (Right $ Token LEFT_BRACE "{" x, xs)
+scanToken ('}':xs) x = (Right $ Token RIGHT_BRACE "}" x, xs)
+scanToken (',':xs) x = (Right $ Token COMMA "," x, xs)
+scanToken ('.':xs) x = (Right $ Token DOT "." x, xs)
+scanToken ('-':xs) x = (Right $ Token MINUS "-" x, xs)
+scanToken ('+':xs) x = (Right $ Token PLUS "+" x, xs)
+scanToken (';':xs) x = (Right $ Token SEMICOLON ";" x, xs)
+scanToken ('*':xs) x = (Right $ Token STAR "*" x, xs)
+scanToken (y:xs) x = (Left $ Error x [y] "unknown char in scanner", xs)  
+scanToken [] x = (Left $ Error x "" "scanToken received empty string", [])  
 
 
 
