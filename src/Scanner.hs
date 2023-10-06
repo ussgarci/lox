@@ -41,42 +41,49 @@ data Error = Error
 --   }
 
 scanTokens :: String -> [Either Error Token]
-scanTokens xs = scanLines (lines xs) 0
+scanTokens source = go source 0
+  where
+    go [] _ = []
+    go xs x = result : go xs' x'
+      where
+        (result, xs', x') = scanToken xs x
 
-scanLines :: [String] -> Int -> [Either Error Token]
-scanLines [] _ = []
-scanLines (xs:xss) lineNum = (scanLine xs lineNum) <> (scanLines xss (lineNum +1))
+scanStringLiteral :: String -> String-> Int -> Int -> (Either Error Token, String, Int)
+scanStringLiteral [] ys start end = (Left $ Error start ys "Unterminated string literal", [], end)
+scanStringLiteral ('\"':xs) ys start end = (Right $ Token STRING ys start, xs, end)
+scanStringLiteral ('\n':xs) ys start end = scanStringLiteral xs (ys ++ ['\n']) start (end + 1)
+scanStringLiteral (x:xs) ys start end = scanStringLiteral xs (ys ++ [x]) start end
 
 
-scanLine :: String -> Int -> [Either Error Token]
-scanLine [] _ = []
-scanLine ('/':'/':_) _ = []
-scanLine (' ':xs) x = scanLine xs x
-scanLine xs x = token : scanLine xs' x 
-  where (token, xs') = scanToken xs x 
-
-scanToken :: String -> Int -> (Either Error Token, String)
-scanToken ('<':'=':xs) x = (Right $ Token LESS_EQUAL "<=" x, xs)
-scanToken ('>':'=':xs) x = (Right $ Token GREATER_EQUAL ">=" x, xs)
-scanToken ('=':'=':xs) x = (Right $ Token EQUAL_EQUAL "==" x, xs)
-scanToken ('!':'=':xs) x = (Right $ Token BANG_EQUAL "!=" x, xs)
-scanToken ('<':xs) x = (Right $ Token LESS "<" x, xs)
-scanToken ('/':xs) x = (Right $ Token SLASH "/" x, xs)
-scanToken ('>':xs) x = (Right $ Token GREATER ">" x, xs)
-scanToken ('=':xs) x = (Right $ Token EQUAL "=" x, xs)
-scanToken ('!':xs) x = (Right $ Token BANG "!" x, xs)
-scanToken ('(':xs) x = (Right $ Token LEFT_PAREN "(" x, xs)
-scanToken (')':xs) x = (Right $ Token RIGHT_PAREN ")" x, xs)
-scanToken ('{':xs) x = (Right $ Token LEFT_BRACE "{" x, xs)
-scanToken ('}':xs) x = (Right $ Token RIGHT_BRACE "}" x, xs)
-scanToken (',':xs) x = (Right $ Token COMMA "," x, xs)
-scanToken ('.':xs) x = (Right $ Token DOT "." x, xs)
-scanToken ('-':xs) x = (Right $ Token MINUS "-" x, xs)
-scanToken ('+':xs) x = (Right $ Token PLUS "+" x, xs)
-scanToken (';':xs) x = (Right $ Token SEMICOLON ";" x, xs)
-scanToken ('*':xs) x = (Right $ Token STAR "*" x, xs)
-scanToken (y:xs) x = (Left $ Error x [y] "unknown char in scanner", xs)  
-scanToken [] x = (Left $ Error x "" "scanToken received empty string", [])  
+scanToken :: String -> Int -> (Either Error Token, String, Int)
+-- "number literals"
+scanToken ('\"':xs ) x = scanStringLiteral xs [] x x
+scanToken ('/':'/':xs) x = scanToken (dropWhile (\y -> y /= '\n') xs) x
+scanToken ('\n':xs) x = scanToken xs (x+1)
+scanToken ('\r':xs) x = scanToken xs (x+1)
+scanToken ('\t':xs) x = scanToken xs (x+1)
+scanToken (' ':xs) x = scanToken xs (x+1)
+scanToken ('<':'=':xs) x = (Right $ Token LESS_EQUAL "<=" x, xs, x)
+scanToken ('>':'=':xs) x = (Right $ Token GREATER_EQUAL ">=" x, xs, x)
+scanToken ('=':'=':xs) x = (Right $ Token EQUAL_EQUAL "==" x, xs, x)
+scanToken ('!':'=':xs) x = (Right $ Token BANG_EQUAL "!=" x, xs, x)
+scanToken ('<':xs) x = (Right $ Token LESS "<" x, xs, x)
+scanToken ('/':xs) x = (Right $ Token SLASH "/" x, xs, x)
+scanToken ('>':xs) x = (Right $ Token GREATER ">" x, xs, x)
+scanToken ('=':xs) x = (Right $ Token EQUAL "=" x, xs, x)
+scanToken ('!':xs) x = (Right $ Token BANG "!" x, xs, x)
+scanToken ('(':xs) x = (Right $ Token LEFT_PAREN "(" x, xs, x)
+scanToken (')':xs) x = (Right $ Token RIGHT_PAREN ")" x, xs, x)
+scanToken ('{':xs) x = (Right $ Token LEFT_BRACE "{" x, xs, x)
+scanToken ('}':xs) x = (Right $ Token RIGHT_BRACE "}" x, xs, x)
+scanToken (',':xs) x = (Right $ Token COMMA "," x, xs, x)
+scanToken ('.':xs) x = (Right $ Token DOT "." x, xs, x)
+scanToken ('-':xs) x = (Right $ Token MINUS "-" x, xs, x)
+scanToken ('+':xs) x = (Right $ Token PLUS "+" x, xs, x)
+scanToken (';':xs) x = (Right $ Token SEMICOLON ";" x, xs, x)
+scanToken ('*':xs) x = (Right $ Token STAR "*" x, xs, x)
+scanToken (y:xs) x = (Left $ Error x [y] "unknown char in scanner", xs, x)  
+scanToken [] x = (Right $ Token EOF "" x, [], x)  
 
 
 
