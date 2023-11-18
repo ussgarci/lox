@@ -27,6 +27,7 @@ library
   exposed-modules:
       Lib
       Scanner
+      Token
   other-modules:
       Paths_lox
   hs-source-dirs:
