@@ -26,6 +26,8 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Scanner
+      Token
   other-modules:
       Paths_lox
   hs-source-dirs:
@@ -33,6 +35,7 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , containers >=0.6.7 && <0.7
   default-language: Haskell2010
 
 executable lox-exe
@@ -44,6 +47,7 @@ executable lox-exe
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers >=0.6.7 && <0.7
     , lox
   default-language: Haskell2010
 
@@ -57,5 +61,6 @@ test-suite lox-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , containers >=0.6.7 && <0.7
     , lox
   default-language: Haskell2010

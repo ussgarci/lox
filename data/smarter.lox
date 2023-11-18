@@ -1,0 +1,6 @@
+// this is a comment
+(( )){} // grouping stuff
+1200.99
+!*+-/=<> <= == // operators
+print "hello world"
+illuminatio = 42
