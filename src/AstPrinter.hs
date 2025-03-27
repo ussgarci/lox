@@ -14,6 +14,6 @@ import Expr qualified as E
 print :: E.Expr -> String
 print = undefined
 
-testor :: E.Expr
-testor = E.Bin E.Div True True
+--testor :: E.Expr
+--testor = E.Bin E.Div True True
 
