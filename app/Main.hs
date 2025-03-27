@@ -3,12 +3,14 @@ module Main (main) where
 import System.Environment (getArgs)
 import System.IO (isEOF)
 import Scanner
+import qualified MegaScanner as MT
 
 
 runFile :: FilePath -> IO ()
 runFile fname = do
-    f <- readFile fname
-    run f
+  f <- readFile fname
+  result <- MT.scan f
+  putStrLn (show result)
 
 runPrompt :: IO ()
 runPrompt = go 
