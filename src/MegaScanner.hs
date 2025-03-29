@@ -1,6 +1,7 @@
 {-# LANGUAGE ImportQualifiedPost #-}
 
 module MegaScanner (
+  MegaToken(..),
   scan
 )
 where

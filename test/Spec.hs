@@ -1,23 +1,63 @@
-import Test.QuickCheck
+--import Test.QuickCheck
 --import Test.HUnit
+import Test.Tasty
+import Test.Tasty.HUnit
+import Text.Megaparsec
+import qualified Data.Text as T
 import qualified Scanner as S
+import qualified MegaScanner as MS
 
-prop_scannerNoErrors :: FilePath -> Property
-prop_scannerNoErrors filePath = ioProperty $ do
-  fileContents <- readFile filePath
-  let results = S.scanTokens fileContents
-  let hasError = any isLeft results
-  if hasError
-    then do
-      putStrLn "Scanner Errors found."
-      return False
-    else do
-      putStrLn "Scanner processed file without errors."
-      return True
+main :: IO()
+main = defaultMain tests
+
+hasErrors :: [Either a b] -> Bool
+hasErrors = any isLeft
   where
     isLeft (Left _) = True
     isLeft (Right _) = False
 
-main :: IO ()
-main = do 
-  quickCheckWith (stdArgs { maxSize = 5, maxSuccess = 5 }) (prop_scannerNoErrors "data/parens.lox") 
+-- Scanner
+scannerUnitTests :: TestTree
+scannerUnitTests = testGroup "Scanner unit tests"
+  [ testCase "No errors scanning data/parens.lox" $ do
+      content <- readFile "data/parens.lox"
+      let errorsFound = hasErrors (S.scanTokens content)
+      errorsFound @?= False
+  , testCase "No errors scanning data/scanning.lox" $ do
+      content <- readFile "data/scanning.lox"
+      let errorsFound = hasErrors (S.scanTokens content)
+      errorsFound @?= False
+  , testCase "No errors scanning data/smarter.lox" $ do
+      content <- readFile "data/smarter.lox"
+      let errorsFound = hasErrors (S.scanTokens content)
+      errorsFound @?= False
+  ]
+
+-- Unit tests group.
+megaScannerUnitTests :: TestTree
+megaScannerUnitTests = testGroup "MegaScanner unit tests"
+  [ testCase "No errors scanning data/parens.lox" $ do
+      content <- readFile "data/parens.lox"
+      let results = MS.scan content :: Either (ParseErrorBundle String T.Text) [MS.MegaToken]
+      case results of
+        Left bundle -> assertFailure (show bundle)
+        Right _ -> assertBool "The result should have no errors" True
+  , testCase "No errors scanning data/scanning.lox" $ do
+      content <- readFile "data/scanning.lox"
+      let results = MS.scan content :: Either (ParseErrorBundle String T.Text) [MS.MegaToken]
+      case results of
+        Left bundle -> assertFailure (show bundle)
+        Right _ -> assertBool "The result should have no errors" True
+  , testCase "No errors scanning data/smarter.lox" $ do
+      content <- readFile "data/smarter.lox"
+      let results = MS.scan content :: Either (ParseErrorBundle String T.Text) [MS.MegaToken]
+      case results of
+        Left bundle -> assertFailure (show bundle)
+        Right _ -> assertBool "The result should have no errors" True
+  ]
+
+tests :: TestTree
+tests = testGroup "Tests" [scannerUnitTests, megaScannerUnitTests]
+
+
+
