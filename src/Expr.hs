@@ -10,8 +10,8 @@ where
 
 data Expr where
     Lit :: Literal -> Expr
-    Una :: UnaryOp -> Expr
-    Bin :: Op -> Expr -> Expr -> Expr
+    --Una :: UnaryOp -> Expr
+    --Bin :: Op -> Expr -> Expr -> Expr
     deriving (Eq, Show)
 
 data Literal where
@@ -32,10 +32,10 @@ data Op where
     Plus :: Op
     Minus :: Op
     Times :: Op
-    Equals :: Op
-    NotEquals :: Op
-    LessThan :: Op
-    GreaterThan :: Op
-    LessThanEq :: Op
-    GreaterThanEq :: Op
+    --Equals :: Op
+    --NotEquals :: Op
+    --LessThan :: Op
+    --GreaterThan :: Op
+    --LessThanEq :: Op
+    --GreaterThanEq :: Op
     deriving (Show, Eq)

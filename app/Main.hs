@@ -26,17 +26,11 @@ runPrompt = go
                 go
             )
 
--- TODO: print each token on newline
--- run :: String -> IO ()
--- run xs = do
---   let scannerResults = S.scanTokens xs
---   case scannerResults of
---     tokens -> print tokens
-
 main :: IO ()
 main = do
     args <- getArgs
+    print args
     case args of
         [fname] -> runFile fname
         [] -> runPrompt
-        _ -> putStrLn $ "Usage: lox [script]"
+        _ -> putStrLn "Usage: lox [script]"
