@@ -2,24 +2,24 @@
 
 module Expr (
     Expr (..),
-    Literal (..),
+    Lit (..),
     UnaryOp (..),
     Op (..),
 )
 where
 
 data Expr where
-    Lit :: Literal -> Expr
-    --Una :: UnaryOp -> Expr
-    --Bin :: Op -> Expr -> Expr -> Expr
+    Lit :: Lit -> Expr
+    Una :: UnaryOp -> Expr -> Expr
+    Bin :: Op -> Expr -> Expr -> Expr
     deriving (Eq, Show)
 
-data Literal where
-    Number :: Integer -> Literal
-    String :: String -> Literal
-    True :: Literal
-    False :: Literal
-    Nil :: Literal
+data Lit where
+    Number :: Integer -> Lit
+    String :: String -> Lit
+    True :: Lit
+    False :: Lit
+    Nil :: Lit
     deriving (Eq, Show)
 
 data UnaryOp where
@@ -32,10 +32,10 @@ data Op where
     Plus :: Op
     Minus :: Op
     Times :: Op
-    --Equals :: Op
-    --NotEquals :: Op
-    --LessThan :: Op
-    --GreaterThan :: Op
-    --LessThanEq :: Op
-    --GreaterThanEq :: Op
+    Equals :: Op
+    NotEquals :: Op
+    LessThan :: Op
+    GreaterThan :: Op
+    LessThanEq :: Op
+    GreaterThanEq :: Op
     deriving (Show, Eq)

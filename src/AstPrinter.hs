@@ -1,24 +1,39 @@
-{-# LANGUAGE GADTSyntax #-}
-
-
 module AstPrinter (
-    print,
+    ppExpr,
 )
 where
 
 import qualified Expr as E
 import Prelude
 
---testor :: E.Expr
---testor = E.Bin E.Plus (E.Lit (E.Number 5)) (E.Lit (E.Number 3))
+testExpr :: E.Expr
+testExpr = E.Bin E.Plus (E.Lit (E.Number 5)) (E.Lit (E.Number 3))
 
-pp :: E.Expr -> IO()
-pp (E.Lit x) = ppLiteral x
+ppExpr :: E.Expr -> String
+ppExpr (E.Lit lit) = ppLiteral lit
+ppExpr (E.Una op x) = ppUnaryOp op ++ "(" ++ ppExpr x ++ ")"
+ppExpr (E.Bin op l r) = "(" ++ ppExpr l ++ " " ++ ppOp op ++ " " ++ ppExpr r ++ ")"
 
-ppLiteral :: E.Literal -> IO ()
-ppLiteral (E.Number x) = print x
-ppLiteral (E.String x) = print x
-ppLiteral E.True = print "True"
-ppLiteral E.False = print "False"
-ppLiteral E.Nil = print "Nihil"
+ppLiteral :: E.Lit -> String
+ppLiteral (E.Number n) = show n
+ppLiteral (E.String s) = "\"" ++ s ++ "\""
+ppLiteral E.True = "True"
+ppLiteral E.False = "False"
+ppLiteral E.Nil = "Nihil"
+
+ppUnaryOp :: E.UnaryOp -> String
+ppUnaryOp E.UnaryNegate = "-"
+ppUnaryOp E.UnaryBang = "!"
+
+ppOp :: E.Op -> String
+ppOp E.Div = "/"
+ppOp E.Plus = "+"
+ppOp E.Minus = "-"
+ppOp E.Times = "*"
+ppOp E.Equals = "=="
+ppOp E.NotEquals = "!="
+ppOp E.LessThan = "<"
+ppOp E.GreaterThan = ">"
+ppOp E.LessThanEq = "<="
+ppOp E.GreaterThanEq = ">="
 
