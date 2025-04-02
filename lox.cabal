@@ -6,12 +6,12 @@ cabal-version: 1.12
 
 name:           lox
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/lox#readme>
-homepage:       https://github.com/githubuser/lox#readme
-bug-reports:    https://github.com/githubuser/lox/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2023 Author name here
+description:    Please see the README on GitHub at <https://github.com/ussgarci/lox#readme>
+homepage:       https://github.com/ussgarci/lox#readme
+bug-reports:    https://github.com/ussgarci/lox/issues
+author:         ussgarci
+maintainer:     ussgarci
+copyright:      2023 USS Garci
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -54,7 +54,6 @@ executable lox-exe
     , containers >=0.6.7 && <0.7
     , lox
     , megaparsec >=9.6.1 && <9.7
-    , structured-cli >= 2.7 && < 2.8  
   default-language: Haskell2010
 
 test-suite lox-test
