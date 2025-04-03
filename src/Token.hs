@@ -1,6 +1,7 @@
 module Token (
     Token (..),
     TokenType (..),
+    TokenPos (..),
     Literal (..),
 )
 where
@@ -54,10 +55,32 @@ data TokenType
 data Literal = IdentifierLiteral String | StringLiteral String | NumberLiteral Double
     deriving (Show, Eq)
 
+-- MegaParsec SourcePos
+-- data SourcePos = SourcePos
+--   { -- | Extract the name of the source from a source position.
+--     sourceName   :: String
+--     -- | Extract the line number from a source position.
+--   , sourceLine   :: !Int
+--     -- | Extract the column number from a source position.
+--   , sourceColumn :: !Int }
+--   deriving (Eq, Ord, Data, Typeable)
+
+data TokenPos = TokenPos 
+    {
+      _name :: String
+    , _line :: !Int 
+    , _column :: !Int 
+    }
+    --deriving (Eq, Ord, Data, Typeable)
+    -- What are Data and Typeable?
+    -- import Data.Data (Data)
+    -- import Data.Typeable (Typeable)
+    deriving (Eq, Ord, Show)
+
 data Token = Token
     { _type :: TokenType
     , _lexeme :: String
     , _literal :: Maybe Literal
-    , _line :: Int
+    , _position :: TokenPos
     }
     deriving (Show, Eq)

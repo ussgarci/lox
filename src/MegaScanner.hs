@@ -1,7 +1,6 @@
 {-# LANGUAGE ImportQualifiedPost #-}
 
 module MegaScanner (
-    MegaToken (..),
     scan,
 )
 where
@@ -14,13 +13,16 @@ import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer qualified as L
 import Token
 
-data MegaToken = MegaToken
-    { _type :: TokenType
-    , _lexeme :: String
-    , -- , _literal :: Maybe Literal
-      _location :: M.SourcePos
-    }
-    deriving (Show, Eq)
+-- data MegaToken = MegaToken
+--     { _type :: TokenType
+--     , _lexeme :: String
+--     ,_location :: M.SourcePos
+--     }
+--     deriving (Show, Eq)
+
+
+sourcePosToTokenPos :: M.SourcePos -> T.TokenPos
+sourcePosToTokenPos = undefined
 
 type Parser = M.Parsec Void String
 
@@ -76,7 +78,7 @@ sc =
         (L.skipLineComment "//") -- (3)
         (L.skipBlockComment "/*" "*/") -- (4)
 
-stringLiteral :: Parser MegaToken
+stringLiteral :: Parser Token
 stringLiteral = do
     sc
     -- Why didn't this work?
@@ -85,7 +87,7 @@ stringLiteral = do
     sc
     MegaToken STRING xs <$> M.getSourcePos
 
-numberLiteral :: Parser MegaToken
+numberLiteral :: Parser Token
 numberLiteral = do
     sc
     -- One or more
@@ -93,21 +95,21 @@ numberLiteral = do
     sc
     MegaToken NUMBER xs <$> M.getSourcePos
 
-singleCharToken :: Parser MegaToken
+singleCharToken :: Parser Token
 singleCharToken = do
     sc
     txt <- M.oneOf $ map fst singleCharTokens
     sc
     MegaToken (singleCharTokenMap M.! txt) [txt] <$> M.getSourcePos
 
-reservedWord :: Parser MegaToken
+reservedWord :: Parser Token
 reservedWord = do
     sc
     xs <- M.choice $ map (string . fst) keywords
     sc
     MegaToken (keywordsMap M.! xs) xs <$> M.getSourcePos
 
-identifier :: Parser MegaToken
+identifier :: Parser Token
 identifier = do
     sc
     x <- letterChar
@@ -115,7 +117,7 @@ identifier = do
     sc
     MegaToken IDENTIFIER (x : xs) <$> M.getSourcePos
 
-scanMegaTokens :: Parser [MegaToken]
+scanMegaTokens :: Parser [Token]
 scanMegaTokens = do
     M.many $
         M.choice
@@ -132,7 +134,7 @@ scanMegaTokens = do
 --   -> String     -- ^ Name of source file
 --   -> s          -- ^ Input for parser
 --   -> Either (ParseErrorBundle s e) ascan :: String -> IO [MegaToken]
-scan :: Monad m => String -> m [MegaToken]
+scan :: Monad m => String -> m [Token]
 scan xs = do
     case M.runParser scanMegaTokens "" xs of
         Left bundle -> error (show bundle)
