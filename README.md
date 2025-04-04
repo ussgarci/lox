@@ -19,3 +19,9 @@ cabal run lox-exe <absolute path to lox file>
 cabal build lox-test
 cabal run lox-test
 ```
+
+Upcoming Projects
+-----------------
+- [Effective Haskell](https://pragprog.com/titles/rshaskell/effective-haskell/)
+- [CSCI 360: Programming Languages](http://ozark.hendrix.edu/~yorgey/360/f16/)
+- [Learn Haskell by building a blog generator](https://learn-haskell.blog/)
