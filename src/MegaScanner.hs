@@ -20,9 +20,12 @@ import Token
 --     }
 --     deriving (Show, Eq)
 
-
-sourcePosToTokenPos :: M.SourcePos -> T.TokenPos
-sourcePosToTokenPos = undefined
+sourcePosToTokenPos :: M.SourcePos -> TokenPos
+sourcePosToTokenPos pos = TokenPos
+    { _name = M.sourceName pos
+    , _line = M.unPos (M.sourceLine pos)
+    , _column = M.unPos (M.sourceColumn pos)
+    }
 
 type Parser = M.Parsec Void String
 
@@ -85,7 +88,7 @@ stringLiteral = do
     -- xs <- M.between (char '\"') (char '\"') (M.many L.charLiteral)
     xs <- char '\"' *> M.manyTill L.charLiteral (char '\"')
     sc
-    MegaToken STRING xs <$> M.getSourcePos
+    Token STRING xs (Just $ StringLiteral xs) . sourcePosToTokenPos <$> M.getSourcePos
 
 numberLiteral :: Parser Token
 numberLiteral = do
@@ -115,7 +118,7 @@ identifier = do
     x <- letterChar
     xs <- M.many alphaNumChar
     sc
-    MegaToken IDENTIFIER (x : xs) <$> M.getSourcePos
+    Token IDENTIFIER (x : xs) <$> sourcePosToTokenPos M.getSourcePos
 
 scanMegaTokens :: Parser [Token]
 scanMegaTokens = do
