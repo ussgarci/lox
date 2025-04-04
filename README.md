@@ -1,19 +1,20 @@
-# lox
+# learn-haskell
 
-This a WIP Haskell implementation of the `lox` programming language from the book [Crafting Interpreters](https://craftinginterpreters.com/) by Robert Nystrom.   
+This is a catch-all repo monitored by [:bee: Beeminder](https://www.beeminder.com/ussgarci/learn-haskell) to keep me accountable for my learning goals.
 
-Building
+Projects
 --------
 
+### lox
+A Haskell implementation of the `lox` language from [Crafting Interpreters](https://craftinginterpreters.com/)
+
+
+#### Building
 ```
 cabal build
 cabal run lox-exe <absolute path to lox file>
 ```
-
-
-Testing
--------
-
+#### Testing
 ```
 cabal build lox-test
 cabal run lox-test
