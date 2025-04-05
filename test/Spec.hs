@@ -1,9 +1,7 @@
--- import Test.QuickCheck
--- import Test.HUnit
-
 import qualified Data.Text as T
 import qualified MegaScanner as MS
 import qualified Scanner as S
+import qualified Token as TK
 import Test.Tasty
 import Test.Tasty.HUnit
 import Text.Megaparsec
@@ -43,19 +41,19 @@ megaScannerUnitTests =
         "MegaScanner unit tests"
         [ testCase "No errors scanning data/parens.lox" $ do
             content <- readFile "data/parens.lox"
-            let results = MS.scan content :: Either (ParseErrorBundle String T.Text) [MS.MegaToken]
+            let results = MS.scan content :: Either (ParseErrorBundle String T.Text) [TK.Token]
             case results of
                 Left bundle -> assertFailure (show bundle)
                 Right _ -> assertBool "The result should have no errors" True
         , testCase "No errors scanning data/scanning.lox" $ do
             content <- readFile "data/scanning.lox"
-            let results = MS.scan content :: Either (ParseErrorBundle String T.Text) [MS.MegaToken]
+            let results = MS.scan content :: Either (ParseErrorBundle String T.Text) [TK.Token]
             case results of
                 Left bundle -> assertFailure (show bundle)
                 Right _ -> assertBool "The result should have no errors" True
         , testCase "No errors scanning data/smarter.lox" $ do
             content <- readFile "data/smarter.lox"
-            let results = MS.scan content :: Either (ParseErrorBundle String T.Text) [MS.MegaToken]
+            let results = MS.scan content :: Either (ParseErrorBundle String T.Text) [TK.Token]
             case results of
                 Left bundle -> assertFailure (show bundle)
                 Right _ -> assertBool "The result should have no errors" True

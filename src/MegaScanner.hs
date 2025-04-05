@@ -13,13 +13,6 @@ import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer qualified as L
 import Token
 
--- data MegaToken = MegaToken
---     { _type :: TokenType
---     , _lexeme :: String
---     ,_location :: M.SourcePos
---     }
---     deriving (Show, Eq)
-
 sourcePosToTokenPos :: M.SourcePos -> TokenPos
 sourcePosToTokenPos pos = TokenPos
     { _name = M.sourceName pos
@@ -96,21 +89,21 @@ numberLiteral = do
     -- One or more
     xs <- M.some digitChar
     sc
-    MegaToken NUMBER xs <$> M.getSourcePos
+    Token NUMBER xs (Just $ NumberLiteral (read xs)). sourcePosToTokenPos <$> M.getSourcePos
 
 singleCharToken :: Parser Token
 singleCharToken = do
     sc
     txt <- M.oneOf $ map fst singleCharTokens
     sc
-    MegaToken (singleCharTokenMap M.! txt) [txt] <$> M.getSourcePos
+    Token (singleCharTokenMap M.! txt) [txt] Nothing . sourcePosToTokenPos <$> M.getSourcePos
 
 reservedWord :: Parser Token
 reservedWord = do
     sc
     xs <- M.choice $ map (string . fst) keywords
     sc
-    MegaToken (keywordsMap M.! xs) xs <$> M.getSourcePos
+    Token (keywordsMap M.! xs) xs Nothing . sourcePosToTokenPos <$> M.getSourcePos
 
 identifier :: Parser Token
 identifier = do
@@ -118,7 +111,7 @@ identifier = do
     x <- letterChar
     xs <- M.many alphaNumChar
     sc
-    Token IDENTIFIER (x : xs) <$> sourcePosToTokenPos M.getSourcePos
+    Token IDENTIFIER (x : xs) (Just $ IdentifierLiteral xs) . sourcePosToTokenPos <$> M.getSourcePos
 
 scanMegaTokens :: Parser [Token]
 scanMegaTokens = do
@@ -142,17 +135,3 @@ scan xs = do
     case M.runParser scanMegaTokens "" xs of
         Left bundle -> error (show bundle)
         Right tokens -> return tokens
-
--- reservedWord' :: Parser MegaToken
--- reservedWord' = do
---   sc
---   xs <- M.oneOf $ map fst keywords
---   sc
---   MegaToken (keywordsMap M.! xs) xs <$> M.getSourcePos
-
--- what was with this error message?!!
--- run' :: String -> IO [MegaToken]
--- run' xs = do
---   case M.parse scanMegaTokens xs of
---     Left bundle -> error (show bundle)
---     Right tokens -> return tokens
