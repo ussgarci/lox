@@ -1,9 +1,19 @@
 {-# LANGUAGE GADTSyntax #-}
 
 module Chapter7 (
-    test
+    --test
 )
 where
+import Control.Monad (join) 
 
-test :: String
+ioFunc1 :: IO (IO String)
+ioFunc1 = (pure . pure) "doggo"
+
+ioFunc2 :: IO (IO String) -> IO String
+ioFunc2 = join
+--ioFunc2 x = do
+--    y <- x
+--    z <- y
+--    return z
+
 test = "doggo"
