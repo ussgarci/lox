@@ -1,9 +1,4 @@
-cabal-version: 1.12
-
--- This file has been generated from package.yaml by hpack version 0.35.2.
---
--- see: https://github.com/sol/hpack
-
+cabal-version: 3.6
 name:           lox
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/ussgarci/lox#readme>
@@ -12,8 +7,6 @@ bug-reports:    https://github.com/ussgarci/lox/issues
 author:         ussgarci
 maintainer:     ussgarci
 copyright:      2023 USS Garci
-license:        BSD3
-license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
@@ -23,21 +16,35 @@ source-repository head
   type: git
   location: https://github.com/githubuser/lox
 
-library lox
+common base
+  build-depends: base >=4.7 && <5
+
+common containers
+  build-depends: containers >=0.6.7 && <0.7
+
+common megaparsec
+  build-depends: megaparsec >=9.6.1 && <9.7
+
+common mtl
+  build-depends: mtl >=2.2.2 && <2.4
+
+library 
   exposed-modules:
       AstPrinter
       Expr
       Lib
       MegaScanner
       Scanner
+      StatefulScanner
       Token
   hs-source-dirs:
-      src/lox
+      src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
-    , containers >=0.6.7 && <0.7
-    , megaparsec >=9.6.1 && <9.7
+      base
+    , containers
+    , megaparsec
+    , mtl
   default-language: Haskell2010
 
 executable lox-exe
@@ -46,10 +53,10 @@ executable lox-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
-    , containers >=0.6.7 && <0.7
+      base
+    , containers
     , lox
-    , megaparsec >=9.6.1 && <9.7
+    , megaparsec
   default-language: Haskell2010
 
 test-suite lox-test
@@ -59,10 +66,10 @@ test-suite lox-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
-    , containers >=0.6.7 && <0.7
+      base
+    , containers
     , lox
-    , megaparsec >=9.6.1 && <9.7
+    , megaparsec
     , tasty >=0.10 && <1.6
     , tasty-hunit >=0.10 && <0.11   
     , text >= 2.0 && < 2.2  
