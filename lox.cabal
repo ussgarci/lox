@@ -32,7 +32,6 @@ library
   exposed-modules:
       AstPrinter
       Expr
-      Lib
       MegaScanner
       Scanner
       StatefulScanner

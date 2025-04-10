@@ -21,4 +21,3 @@ scan = undefined
 --     (ln, cl) <- get
 --     return Right $ Token EOF "" Nothing TokenPos "" ln cl
 -- scan (x:xs) = undefined
-
