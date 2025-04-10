@@ -1,5 +1,5 @@
 module StatefulScanner (
-    scan
+    scanTokens
 )
 where
 
@@ -8,16 +8,35 @@ import Data.Char (isAlpha, isAlphaNum, isDigit)
 import qualified Data.Map as M
 import Token (Literal (..), Token (..), TokenType (..), TokenPos (..))
 
-type Line = Int
-type Column = Int
-type ScannerState = (Line, Column)
+data ScannerState = ScannerState
+    { source :: String
+    , start :: Int
+    , current :: Int
+    , line :: Int
+    }
+    deriving (Show)
 
-startState :: ScannerState
-startState = (0,0)
+--startState :: ScannerState
+--startState = ScannerState 0 0 1 
 
-scan :: String -> State ScannerState [Token]
-scan = undefined
+isAtEnd :: ScannerState -> Bool
+isAtEnd ss = current ss >= length (source ss)
+
+scanTokens :: String -> State ScannerState [Token]
+scanTokens = undefined
 -- scan [] = do
 --     (ln, cl) <- get
 --     return Right $ Token EOF "" Nothing TokenPos "" ln cl
 -- scan (x:xs) = undefined
+
+scanToken :: State ScannerState [Token]
+scanToken = do
+    c <- advance
+    undefined
+
+advance:: State ScannerState Char
+advance = do
+   state <- get
+   let curr = current state + 1
+   let src = source state
+   return (src !! curr)
