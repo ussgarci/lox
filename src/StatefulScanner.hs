@@ -22,7 +22,7 @@ data ScannerState = ScannerState
 isAtEnd :: ScannerState -> Bool
 isAtEnd ss = current ss >= length (source ss)
 
-scanTokens :: String -> State ScannerState [Token]
+scanTokens :: State ScannerState [Token]
 scanTokens = undefined
 -- scan [] = do
 --     (ln, cl) <- get
