@@ -8,14 +8,15 @@ where
 import Data.Char (isAlpha, isAlphaNum, isDigit)
 import Data.Map (Map)
 import Data.Map qualified as M
-import Token (Literal (..), Token (..), TokenType (..), TokenPos (..))
+import Token (Literal (..), Token (..), TokenPos (..), TokenType (..))
 
 ln2pos :: Int -> TokenPos
-ln2pos ln = TokenPos
-    { _name = ""
-    , _line = ln
-    , _column = 0
-    }
+ln2pos ln =
+    TokenPos
+        { _name = ""
+        , _line = ln
+        , _column = 0
+        }
 
 data Error = Error
     { lineNumber :: Int
@@ -100,7 +101,7 @@ scanToken xs ln = case xs of
     ('\n' : rest) -> scanToken rest (ln + 1)
     ('\r' : rest) -> scanToken rest (ln + 1)
     ('\t' : rest) -> scanToken rest (ln + 1)
-    (' ' : rest)  -> scanToken rest (ln + 1)
+    (' ' : rest) -> scanToken rest (ln + 1)
     ('<' : '=' : rest) -> (Right $ Token LESS_EQUAL "<=" Nothing pos, rest, ln)
     ('>' : '=' : rest) -> (Right $ Token GREATER_EQUAL ">=" Nothing pos, rest, ln)
     ('=' : '=' : rest) -> (Right $ Token EQUAL_EQUAL "==" Nothing pos, rest, ln)
@@ -120,10 +121,10 @@ scanToken xs ln = case xs of
     ('+' : rest) -> (Right $ Token PLUS "+" Nothing pos, rest, ln)
     (';' : rest) -> (Right $ Token SEMICOLON ";" Nothing pos, rest, ln)
     ('*' : rest) -> (Right $ Token STAR "*" Nothing pos, rest, ln)
-    (x : rest) 
-      | isDigit x -> scanNumberLiteral (x : rest) [] ln
-      | isAlpha x -> scanIdentifier (x : rest) [] ln
-      | otherwise -> (Left $ Error ln [x] "unknown char in scanner", rest, ln)
+    (x : rest)
+        | isDigit x -> scanNumberLiteral (x : rest) [] ln
+        | isAlpha x -> scanIdentifier (x : rest) [] ln
+        | otherwise -> (Left $ Error ln [x] "unknown char in scanner", rest, ln)
     [] -> (Right $ Token EOF "" Nothing pos, [], ln)
-    where 
-        pos = ln2pos ln
+  where
+    pos = ln2pos ln

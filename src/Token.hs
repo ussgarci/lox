@@ -65,13 +65,12 @@ data Literal = IdentifierLiteral String | StringLiteral String | NumberLiteral D
 --   , sourceColumn :: !Int }
 --   deriving (Eq, Ord, Data, Typeable)
 
-data TokenPos = TokenPos 
-    {
-      _name :: String
-    , _line :: !Int 
-    , _column :: !Int 
+data TokenPos = TokenPos
+    { _name :: String
+    , _line :: !Int
+    , _column :: !Int
     }
-    --deriving (Eq, Ord, Data, Typeable)
+    -- deriving (Eq, Ord, Data, Typeable)
     -- What are Data and Typeable?
     -- import Data.Data (Data)
     -- import Data.Typeable (Typeable)

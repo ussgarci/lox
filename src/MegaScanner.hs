@@ -14,11 +14,12 @@ import Text.Megaparsec.Char.Lexer qualified as L
 import Token
 
 sourcePosToTokenPos :: M.SourcePos -> TokenPos
-sourcePosToTokenPos pos = TokenPos
-    { _name = M.sourceName pos
-    , _line = M.unPos (M.sourceLine pos)
-    , _column = M.unPos (M.sourceColumn pos)
-    }
+sourcePosToTokenPos pos =
+    TokenPos
+        { _name = M.sourceName pos
+        , _line = M.unPos (M.sourceLine pos)
+        , _column = M.unPos (M.sourceColumn pos)
+        }
 
 type Parser = M.Parsec Void String
 
@@ -89,7 +90,7 @@ numberLiteral = do
     -- One or more
     xs <- M.some digitChar
     sc
-    Token NUMBER xs (Just $ NumberLiteral (read xs)). sourcePosToTokenPos <$> M.getSourcePos
+    Token NUMBER xs (Just $ NumberLiteral (read xs)) . sourcePosToTokenPos <$> M.getSourcePos
 
 singleCharToken :: Parser Token
 singleCharToken = do
@@ -130,7 +131,7 @@ scanMegaTokens = do
 --   -> String     -- ^ Name of source file
 --   -> s          -- ^ Input for parser
 --   -> Either (ParseErrorBundle s e) ascan :: String -> IO [MegaToken]
-scan :: Monad m => String -> m [Token]
+scan :: (Monad m) => String -> m [Token]
 scan xs = do
     case M.runParser scanMegaTokens "" xs of
         Left bundle -> error (show bundle)

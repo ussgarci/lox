@@ -1,10 +1,10 @@
 import qualified Data.Text as T
 import qualified MegaScanner as MS
 import qualified Scanner as S
-import qualified Token as TK
 import Test.Tasty
 import Test.Tasty.HUnit
 import Text.Megaparsec
+import qualified Token as TK
 
 main :: IO ()
 main = defaultMain tests
