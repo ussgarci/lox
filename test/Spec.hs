@@ -1,6 +1,7 @@
 import qualified Data.Text as T
 import qualified MegaScanner as MS
 import qualified Scanner as S
+import qualified StatefulScanner as SS
 import Test.Tasty
 import Test.Tasty.HUnit
 import Text.Megaparsec
@@ -59,5 +60,31 @@ megaScannerUnitTests =
                 Right _ -> assertBool "The result should have no errors" True
         ]
 
+-- Test group specifically for the isAtEnd function
+isAtEndUnitTests :: TestTree
+isAtEndUnitTests =
+    testGroup --
+        "isAtEnd unit tests"
+        [ testCase "Returns False when current < length" $ do
+            let text = T.pack "some text"
+            let state = SS.ScannerState text 0 0 1
+            SS.isAtEnd state @?= False
+        , testCase "Returns False when current is mid-text" $ do
+            let text = T.pack "some text"
+            let state = SS.ScannerState text 2 5 1
+            SS.isAtEnd state @?= False
+        , testCase "Returns True when current == length" $ do
+            let text = T.pack "some text"
+            let state = SS.ScannerState text (T.length text) (T.length text) 1
+            SS.isAtEnd state @?= True
+        , testCase "Returns True when current > length" $ do
+            let text = T.pack "some text"
+            let state = SS.ScannerState text (T.length text) (T.length text + 1) 1
+            SS.isAtEnd state @?= True
+        , testCase "Returns True for empty source text" $ do
+            let state = SS.ScannerState T.empty 0 0 1
+            SS.isAtEnd state @?= True
+        ]
+
 tests :: TestTree
-tests = testGroup "Tests" [scannerUnitTests, megaScannerUnitTests]
+tests = testGroup "Tests" [scannerUnitTests, megaScannerUnitTests, isAtEndUnitTests]

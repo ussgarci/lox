@@ -1,6 +1,7 @@
 module StatefulScanner (
     ScannerState (..),
     scanTokens,
+    isAtEnd,
 )
 where
 
@@ -33,9 +34,6 @@ data ScannerState = ScannerState
     }
     deriving (Show)
 
--- startState :: ScannerState
--- startState = ScannerState 0 0 1
-
 isAtEnd :: ScannerState -> Bool
 isAtEnd ss = current ss >= T.length (source ss)
 
@@ -54,7 +52,15 @@ scanToken = do
 
 advance :: State ScannerState Char
 advance = do
-    state <- get
-    let curr = current state + 1
-    let src = source state
-    return $ T.index src curr
+    currentState <- get
+    let c = T.index (source currentState) (current currentState)
+    modify $ \s ->
+        let
+            nextLine =
+                if c == '\n'
+                    then line s + 1
+                    else line s
+            nextCurrent = current s + 1
+         in
+            s{current = nextCurrent, line = nextLine}
+    return c
