@@ -5,10 +5,12 @@ module StatefulScanner (
 )
 where
 
+import Control.Monad
 import Control.Monad.State
 import Data.Char (isAlpha, isAlphaNum, isDigit)
 import qualified Data.Map as M
 import qualified Data.Text as T
+import Data.Void (Void)
 import Token (Literal (..), TokenType (..))
 
 data TokenPos = TokenPos
@@ -31,24 +33,41 @@ data ScannerState = ScannerState
     , start :: Int
     , current :: Int
     , line :: Int
+    , tokens :: [Token]
     }
     deriving (Show)
 
 isAtEnd :: ScannerState -> Bool
 isAtEnd ss = current ss >= T.length (source ss)
 
-scanTokens :: State ScannerState [Token]
-scanTokens = undefined
+-- runPrompt :: IO ()
+-- runPrompt = go
+--   where
+--     go = do
+--         ended <- isEOF
+--         Control.Monad.unless
+--             ended
+--             ( do
+--                 input <- getLine
+--                 putStrLn input
+--                 go
+--             )
 
--- scan [] = do
---     (ln, cl) <- get
---     return Right $ Token EOF "" Nothing TokenPos "" ln cl
--- scan (x:xs) = undefined
-
-scanToken :: State ScannerState [Token]
-scanToken = do
-    c <- advance
-    undefined
+scanTokens :: State ScannerState ()
+scanTokens = go
+  where
+    go = do
+        currentState <- get
+        let ended = isAtEnd currentState
+        Control.Monad.unless
+            ended
+            ( do
+                c <- advance
+                case c of
+                    '(' -> addToken LEFT_PAREN
+                    _ -> undefined
+                go
+            )
 
 advance :: State ScannerState Char
 advance = do
@@ -64,3 +83,6 @@ advance = do
          in
             s{current = nextCurrent, line = nextLine}
     return c
+
+addToken :: TokenType -> State ScannerState ()
+addToken = undefined
