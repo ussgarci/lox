@@ -86,3 +86,16 @@ advance = do
 
 addToken :: TokenType -> State ScannerState ()
 addToken = undefined
+
+match :: Char -> State ScannerState Bool
+match expected = do
+    currentState <- get
+    if (isAtEnd currentState || (T.index (source currentState) (current currentState) /= expected))
+        then return False
+        else do
+            modify $ \s ->
+                let
+                    nextCurrent = current s + 1
+                 in
+                    s{current = nextCurrent}
+            return True
