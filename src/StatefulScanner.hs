@@ -62,12 +62,16 @@ scanTokens = go
         Control.Monad.unless
             ended
             ( do
-                c <- advance
-                case c of
-                    '(' -> addToken LEFT_PAREN
-                    _ -> undefined
+                scanToken
                 go
             )
+
+scanToken :: State ScannerState ()
+scanToken = do
+    c <- advance
+    case c of
+        '(' -> addToken LEFT_PAREN
+        _ -> undefined
 
 advance :: State ScannerState Char
 advance = do
