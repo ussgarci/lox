@@ -36,7 +36,7 @@ main = do
     case args of
         [fname] -> do
             contents <- readFile fname
-            let result = evalState SS.scanTokens (SS.ScannerState (T.pack contents) 0 0 1)
+            let result = evalState SS.scanTokens (SS.ScannerState (T.pack contents) 0 0 1 [])
             print result
         [] -> runPrompt
         _ -> putStrLn "Usage: lox [script]"

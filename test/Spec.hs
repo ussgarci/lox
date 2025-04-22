@@ -67,22 +67,22 @@ isAtEndUnitTests =
         "isAtEnd unit tests"
         [ testCase "Returns False when current < length" $ do
             let text = T.pack "some text"
-            let state = SS.ScannerState text 0 0 1
+            let state = SS.ScannerState text 0 0 1 []
             SS.isAtEnd state @?= False
         , testCase "Returns False when current is mid-text" $ do
             let text = T.pack "some text"
-            let state = SS.ScannerState text 2 5 1
+            let state = SS.ScannerState text 2 5 1 []
             SS.isAtEnd state @?= False
         , testCase "Returns True when current == length" $ do
             let text = T.pack "some text"
-            let state = SS.ScannerState text (T.length text) (T.length text) 1
+            let state = SS.ScannerState text (T.length text) (T.length text) 1 []
             SS.isAtEnd state @?= True
         , testCase "Returns True when current > length" $ do
             let text = T.pack "some text"
-            let state = SS.ScannerState text (T.length text) (T.length text + 1) 1
+            let state = SS.ScannerState text (T.length text) (T.length text + 1) 1 []
             SS.isAtEnd state @?= True
         , testCase "Returns True for empty source text" $ do
-            let state = SS.ScannerState T.empty 0 0 1
+            let state = SS.ScannerState T.empty 0 0 1 []
             SS.isAtEnd state @?= True
         ]
 

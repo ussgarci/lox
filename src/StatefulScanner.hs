@@ -7,11 +7,8 @@ where
 
 import Control.Monad
 import Control.Monad.State
-import Data.Char (isAlpha, isAlphaNum, isDigit)
-import qualified Data.Map as M
 import qualified Data.Text as T
-import Data.Void (Void)
-import Token (Literal (..), TokenType (..))
+import Token (TokenType (..))
 
 data TokenPos = TokenPos
     { _name :: T.Text
@@ -36,6 +33,9 @@ data ScannerState = ScannerState
     , tokens :: [Token]
     }
     deriving (Show)
+
+data Literal = Identifier T.Text | String T.Text | Number Double
+    deriving (Show, Eq)
 
 isAtEnd :: ScannerState -> Bool
 isAtEnd ss = current ss >= T.length (source ss)
@@ -69,9 +69,9 @@ scanTokens = go
 scanToken :: State ScannerState ()
 scanToken = do
     c <- advance
-    case c of
-        '(' -> addToken LEFT_PAREN
-        _ -> undefined
+    case c of 
+       '(' -> addToken LEFT_PAREN Nothing
+       _   -> undefined
 
 advance :: State ScannerState Char
 advance = do
@@ -88,7 +88,8 @@ advance = do
             s{current = nextCurrent, line = nextLine}
     return c
 
-addToken :: TokenType -> State ScannerState ()
+addToken :: TokenType -> Maybe Literal -> State ScannerState ()
+--     tokens.add(new Token(type, text, literal, line));
 addToken = undefined
 
 match :: Char -> State ScannerState Bool
