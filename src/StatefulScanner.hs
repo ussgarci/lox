@@ -69,9 +69,9 @@ scanTokens = go
 scanToken :: State ScannerState ()
 scanToken = do
     c <- advance
-    case c of 
-       '(' -> addToken LEFT_PAREN Nothing
-       _   -> undefined
+    case c of
+        '(' -> addToken LEFT_PAREN Nothing
+        _ -> undefined
 
 advance :: State ScannerState Char
 advance = do
