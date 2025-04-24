@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 module StatefulScanner (
     ScannerState (..),
     scanTokens,
@@ -40,19 +42,6 @@ data Literal = Identifier T.Text | String T.Text | Number Double
 isAtEnd :: ScannerState -> Bool
 isAtEnd ss = current ss >= T.length (source ss)
 
--- runPrompt :: IO ()
--- runPrompt = go
---   where
---     go = do
---         ended <- isEOF
---         Control.Monad.unless
---             ended
---             ( do
---                 input <- getLine
---                 putStrLn input
---                 go
---             )
-
 scanTokens :: State ScannerState ()
 scanTokens = go
   where
@@ -90,7 +79,12 @@ advance = do
 
 addToken :: TokenType -> Maybe Literal -> State ScannerState ()
 --     tokens.add(new Token(type, text, literal, line));
-addToken = undefined
+addToken = \cases
+    tt Nothing -> undefined
+    tt (Just (Identifier xs)) -> undefined
+    tt (Just (String xs)) -> undefined
+    tt (Just (Number xs)) -> undefined
+    _ _ -> undefined
 
 match :: Char -> State ScannerState Bool
 match expected = do
