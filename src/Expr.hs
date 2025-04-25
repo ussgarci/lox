@@ -25,7 +25,11 @@ data Lit where
 data UnaryOp where
     UnaryNegate :: UnaryOp
     UnaryBang :: UnaryOp
-    deriving (Eq, Show)
+    deriving (Eq)
+
+instance Show UnaryOp where
+    show UnaryNegate = "-"
+    show UnaryBang = "!"
 
 data Op where
     Div :: Op
@@ -38,4 +42,16 @@ data Op where
     GreaterThan :: Op
     LessThanEq :: Op
     GreaterThanEq :: Op
-    deriving (Show, Eq)
+    deriving (Eq)
+
+instance Show Op where
+    show Div = "/"
+    show Plus = "+"
+    show Minus = "-"
+    show Times = "*"
+    show Equals = "="
+    show NotEquals = "/="
+    show LessThan = "<"
+    show GreaterThan = ">"
+    show LessThanEq = "<="
+    show GreaterThanEq = ">="

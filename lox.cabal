@@ -66,6 +66,7 @@ executable lox-exe
 
 test-suite lox-test
   type: exitcode-stdio-1.0
+  --ghc-options:  -main-is Test  try this
   main-is: Spec.hs
   hs-source-dirs:
       test
