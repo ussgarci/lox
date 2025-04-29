@@ -60,6 +60,15 @@ scanToken = do
     c <- advance
     case c of
         '(' -> addToken LEFT_PAREN Nothing
+        ')' -> addToken RIGHT_PAREN Nothing
+        '{' -> addToken LEFT_BRACE Nothing
+        '}' -> addToken RIGHT_BRACE Nothing
+        ',' -> addToken COMMA Nothing
+        '.' -> addToken DOT Nothing
+        '-' -> addToken MINUS Nothing
+        '+' -> addToken PLUS Nothing
+        ';' -> addToken SEMICOLON Nothing
+        '*' -> addToken STAR Nothing
         _ -> undefined
 
 advance :: State ScannerState Char
