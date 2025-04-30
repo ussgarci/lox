@@ -12,18 +12,19 @@ import Control.Monad.State
 import qualified Data.Text as T
 import Token (TokenType (..))
 
-data TokenPos = TokenPos
-    { _name :: T.Text
-    , _line :: !Int
-    , _column :: !Int
-    }
-    deriving (Eq, Ord, Show)
+-- data TokenPos = TokenPos
+--     { _name :: T.Text
+--     , _line :: !Int
+--     , _column :: !Int
+--     }
+--     deriving (Eq, Ord, Show)
 
 data Token = Token
     { _type :: TokenType
     , _lexeme :: T.Text
-    , _literal :: Literal
-    , _position :: TokenPos
+    , _literal :: Maybe Literal
+    , _line :: Int
+    -- , _position :: TokenPos
     }
     deriving (Show, Eq)
 
@@ -88,12 +89,13 @@ advance = do
 
 addToken :: TokenType -> Maybe Literal -> State ScannerState ()
 --     tokens.add(new Token(type, text, literal, line));
-addToken = \cases
-    tt Nothing -> undefined
-    tt (Just (Identifier xs)) -> undefined
-    tt (Just (String xs)) -> undefined
-    tt (Just (Number xs)) -> undefined
-    _ _ -> undefined
+addToken tt lit = do
+    currState <- get
+    let currTokens = tokens currState
+    let currLine = line currState
+    modify $ \s ->
+        s{tokens = currTokens ++ [Token tt (T.pack "") lit currLine]}
+    return ()
 
 match :: Char -> State ScannerState Bool
 match expected = do
