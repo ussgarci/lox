@@ -70,7 +70,8 @@ scanToken = do
         '+' -> addToken PLUS Nothing
         ';' -> addToken SEMICOLON Nothing
         '*' -> addToken STAR Nothing
-        _ -> undefined
+        ' ' -> scanToken
+        _ -> error "Unexpected character."
 
 advance :: State ScannerState Char
 advance = do
