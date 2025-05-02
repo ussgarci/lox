@@ -8,6 +8,7 @@ module StatefulScanner (
 where
 
 import Control.Monad
+import Control.Monad.Extra (ifM, notM, whileM)
 import Control.Monad.State
 import qualified Data.Text as T
 import Token (TokenType (..))
@@ -70,8 +71,55 @@ scanToken = do
         '+' -> addToken PLUS Nothing
         ';' -> addToken SEMICOLON Nothing
         '*' -> addToken STAR Nothing
+        '!' ->
+            ifM
+                (match '=')
+                (addToken BANG_EQUAL Nothing)
+                (addToken BANG Nothing)
+        '=' ->
+            ifM
+                (match '=')
+                (addToken EQUAL_EQUAL Nothing)
+                (addToken EQUAL Nothing)
+        '<' ->
+            ifM
+                (match '=')
+                (addToken LESS_EQUAL Nothing)
+                (addToken LESS Nothing)
+        '>' ->
+            ifM
+                (match '=')
+                (addToken GREATER_EQUAL Nothing)
+                (addToken GREATER Nothing)
+        '/' ->
+            ifM
+                (notM $ match '/')
+                (addToken SLASH Nothing)
+                skip
+          where
+            skip = do
+                c <- peek
+                let atEnd = get () >= isAtEnd
+                Control.Monad.unless
+                    c
+                    == '\n'
+                    || atEnd
+                        ( do
+                            advance
+                            skip
+                        )
+                return
+        '\r' -> scanToken
+        '\t' -> scanToken
+        '\n' -> do
+            modify $ \s -> s{line = line s + 1}
         ' ' -> scanToken
         _ -> error "Unexpected character."
+
+peek :: State ScannerState Char
+peek = do
+    currentState <- get
+    return T.index (source currentState) (current currentState)
 
 advance :: State ScannerState Char
 advance = do

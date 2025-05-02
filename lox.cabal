@@ -29,7 +29,10 @@ common mtl
   build-depends: mtl >=2.2.2 && <2.4
 
 common text
-  build-depends: text >= 2.0 && < 2.2  
+  build-depends: text >= 2.0 && < 2.2 
+
+common extra
+  build-depends: extra >=1.8 && <1.9
 
 library 
   exposed-modules:
@@ -48,6 +51,7 @@ library
     , megaparsec
     , mtl
     , text
+    , extra
   default-language: Haskell2010
 
 executable lox-exe
