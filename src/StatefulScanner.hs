@@ -111,6 +111,7 @@ scanToken = do
         '\t' -> scanToken
         '\n' -> do
             modify $ \s -> s{line = line s + 1}
+            scanToken
         ' ' -> scanToken
         _ -> error "Unexpected character."
 

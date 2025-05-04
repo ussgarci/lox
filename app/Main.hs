@@ -1,7 +1,7 @@
 module Main (main) where
 
 import Control.Monad (unless)
-import Control.Monad.State (evalState)
+import Control.Monad.State (evalState, execState)
 import qualified Data.Text as T
 import System.Environment (getArgs)
 import System.IO (isEOF)
@@ -36,8 +36,9 @@ main = do
     case args of
         [fname] -> do
             contents <- readFile fname
-            let result = evalState SS.scanTokens (SS.ScannerState (T.pack contents) 0 0 1 [])
-            print result
+            -- let result = evalState SS.scanTokens (SS.ScannerState (T.pack contents) 0 0 1 [])
+            let result = execState SS.scanTokens (SS.ScannerState (T.pack contents) 0 0 1 [])
+            print $ SS.tokens result
         [] -> runPrompt
         _ -> putStrLn "Usage: lox [script]"
 
