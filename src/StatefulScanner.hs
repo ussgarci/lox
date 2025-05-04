@@ -98,17 +98,15 @@ scanToken = do
                 skip
           where
             skip = do
-                c <- peek
-                let atEnd = get () >= isAtEnd
+                p <- peek
+                currentState <- get
+                let atEnd = isAtEnd currentState
                 Control.Monad.unless
-                    c
-                    == '\n'
-                    || atEnd
-                        ( do
-                            advance
-                            skip
-                        )
-                return
+                    (p == '\n' || atEnd)
+                    ( do
+                        _ <- advance
+                        skip
+                    )
         '\r' -> scanToken
         '\t' -> scanToken
         '\n' -> do
@@ -119,7 +117,7 @@ scanToken = do
 peek :: State ScannerState Char
 peek = do
     currentState <- get
-    return T.index (source currentState) (current currentState)
+    return (T.index (source currentState) (current currentState))
 
 advance :: State ScannerState Char
 advance = do
