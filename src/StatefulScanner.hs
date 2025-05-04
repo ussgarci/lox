@@ -117,7 +117,9 @@ scanToken = do
 peek :: State ScannerState Char
 peek = do
     currentState <- get
-    return (T.index (source currentState) (current currentState))
+    if isAtEnd currentState
+        then return '\0'
+        else return $ T.index (source currentState) (current currentState)
 
 advance :: State ScannerState Char
 advance = do
