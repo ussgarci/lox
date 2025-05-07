@@ -1,4 +1,6 @@
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedRecordDot #-}
 
 module StatefulScanner (
     ScannerState (..),
@@ -13,19 +15,17 @@ import Control.Monad.State
 import qualified Data.Text as T
 import Token (TokenType (..))
 
--- data TokenPos = TokenPos
---     { _name :: T.Text
---     , _line :: !Int
---     , _column :: !Int
---     }
---     deriving (Eq, Ord, Show)
+data Error = Error
+    { _message :: T.Text
+    , _line :: Int
+    }
+    deriving (Show, Eq)
 
 data Token = Token
     { _type :: TokenType
     , _lexeme :: T.Text
     , _literal :: Maybe Literal
     , _line :: Int
-    -- , _position :: TokenPos
     }
     deriving (Show, Eq)
 
@@ -35,6 +35,7 @@ data ScannerState = ScannerState
     , current :: Int
     , line :: Int
     , tokens :: [Token]
+    , errors :: [Error]
     }
     deriving (Show)
 
@@ -42,7 +43,7 @@ data Literal = Identifier T.Text | String T.Text | Number Double
     deriving (Show, Eq)
 
 isAtEnd :: ScannerState -> Bool
-isAtEnd ss = current ss >= T.length (source ss)
+isAtEnd ss = current ss >= T.length ss.source
 
 scanTokens :: State ScannerState ()
 scanTokens = go
@@ -120,12 +121,12 @@ peek = do
     currentState <- get
     if isAtEnd currentState
         then return '\0'
-        else return $ T.index (source currentState) (current currentState)
+        else return $ T.index currentState.source currentState.current
 
 advance :: State ScannerState Char
 advance = do
     currentState <- get
-    let c = T.index (source currentState) (current currentState)
+    let c = T.index currentState.source currentState.current
     modify $ \s ->
         let
             nextLine =
@@ -141,8 +142,8 @@ addToken :: TokenType -> Maybe Literal -> State ScannerState ()
 --     tokens.add(new Token(type, text, literal, line));
 addToken tt lit = do
     currState <- get
-    let currTokens = tokens currState
-    let currLine = line currState
+    let currTokens = currState.tokens
+    let currLine = currState.line
     modify $ \s ->
         s{tokens = currTokens ++ [Token tt (T.pack "") lit currLine]}
     return ()
@@ -150,7 +151,7 @@ addToken tt lit = do
 match :: Char -> State ScannerState Bool
 match expected = do
     currentState <- get
-    if (isAtEnd currentState || (T.index (source currentState) (current currentState) /= expected))
+    if (isAtEnd currentState || (T.index currentState.source currentState.current /= expected))
         then return False
         else do
             modify $ \s ->
