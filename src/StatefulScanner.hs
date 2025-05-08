@@ -60,7 +60,7 @@ scanTokens = go
 
 scanToken :: State ScannerState ()
 scanToken = do
-    c <- advance
+    (c, ln) <- advance
     case c of
         '(' -> addToken LEFT_PAREN Nothing
         ')' -> addToken RIGHT_PAREN Nothing
@@ -114,7 +114,15 @@ scanToken = do
             modify $ \s -> s{line = line s + 1}
             scanToken
         ' ' -> scanToken
-        _ -> error "Unexpected character."
+        _ -> do
+            _ <- logError (T.pack "Unexpected character") ln
+            scanToken
+
+logError :: T.Text -> Int -> State ScannerState ()
+logError msg ln = do
+    currentState <- get
+    modify $ \s ->
+        s{errors = currentState.errors ++ [Error msg ln]}
 
 peek :: State ScannerState Char
 peek = do
@@ -123,7 +131,7 @@ peek = do
         then return '\0'
         else return $ T.index currentState.source currentState.current
 
-advance :: State ScannerState Char
+advance :: State ScannerState (Char, Int)
 advance = do
     currentState <- get
     let c = T.index currentState.source currentState.current
@@ -136,7 +144,7 @@ advance = do
             nextCurrent = current s + 1
          in
             s{current = nextCurrent, line = nextLine}
-    return c
+    return (c, currentState.line)
 
 addToken :: TokenType -> Maybe Literal -> State ScannerState ()
 --     tokens.add(new Token(type, text, literal, line));
