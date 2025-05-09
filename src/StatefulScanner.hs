@@ -9,8 +9,9 @@ module StatefulScanner (
 )
 where
 
-import Control.Monad
-import Control.Monad.Extra (ifM, notM, whileM)
+import Control.Monad (unless, when)
+import Control.Monad.Extra (ifM, notM)
+import Control.Monad.Loops (whileM_)
 import Control.Monad.State
 import qualified Data.Text as T
 import Token (TokenType (..))
@@ -118,11 +119,46 @@ scanToken = do
             _ <- logError (T.pack "Unexpected character") ln
             scanToken
 
+-- private void string() {
+--   while (peek() != '"' && !isAtEnd()) {
+--     if (peek() == '\n') line++;
+--     advance();
+--   }
+
+--   if (isAtEnd()) {
+--     Lox.error(line, "Unterminated string.");
+--     return;
+--   }
+
+--   // The closing ".
+--   advance();
+
+--   // Trim the surrounding quotes.
+--   String value = source.substring(start + 1, current - 1);
+--   addToken(STRING, value);
+-- }
+
+string :: State ScannerState ()
+string = do
+    whileM_
+        ( do
+            c <- peek
+            currentState <- get
+            return $ c /= '"' && isAtEnd currentState
+        )
+        ( do
+            advance
+        )
+    when gets isAtEnd $ error "AAAAAH"
+    advance
+    let val = undefined -- TBD
+    addToken STRING (Just $ String val)
+    return ()
+
 logError :: T.Text -> Int -> State ScannerState ()
 logError msg ln = do
-    currentState <- get
     modify $ \s ->
-        s{errors = currentState.errors ++ [Error msg ln]}
+        s{errors = s.errors ++ [Error msg ln]}
 
 peek :: State ScannerState Char
 peek = do
