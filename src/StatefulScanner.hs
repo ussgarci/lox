@@ -10,7 +10,7 @@ module StatefulScanner (
 where
 
 import Control.Monad (unless, when)
-import Control.Monad.Extra (ifM, notM)
+import Control.Monad.Extra (ifM, notM, whenM)
 import Control.Monad.Loops (whileM_)
 import Control.Monad.State
 import qualified Data.Text as T
@@ -52,6 +52,7 @@ scanTokens = go
     go = do
         currentState <- get
         let ended = isAtEnd currentState
+        modify $ \s -> s{start = s.current}
         Control.Monad.unless
             ended
             ( do
@@ -115,6 +116,7 @@ scanToken = do
             modify $ \s -> s{line = line s + 1}
             scanToken
         ' ' -> scanToken
+        '"' -> string
         _ -> do
             _ <- logError (T.pack "Unexpected character") ln
             scanToken
@@ -137,6 +139,8 @@ scanToken = do
 --   String value = source.substring(start + 1, current - 1);
 --   addToken(STRING, value);
 -- }
+slice :: Int -> Int -> T.Text -> T.Text
+slice a b = T.take (b - a) . T.drop a
 
 string :: State ScannerState ()
 string = do
@@ -149,11 +153,11 @@ string = do
         ( do
             advance
         )
-    when gets isAtEnd $ error "AAAAAH"
-    advance
-    let val = undefined -- TBD
+    whenM (gets isAtEnd) $ error "AAAAAH"
+    _ <- advance
+    currentState <- get
+    let val = slice (currentState.start + 1) (currentState.current - 1) currentState.source
     addToken STRING (Just $ String val)
-    return ()
 
 logError :: T.Text -> Int -> State ScannerState ()
 logError msg ln = do
