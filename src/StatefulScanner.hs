@@ -4,7 +4,9 @@
 
 module StatefulScanner (
     ScannerState (..),
+    Token (..),
     scanTokens,
+    scanToken,
     isAtEnd,
 )
 where
