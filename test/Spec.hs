@@ -88,32 +88,38 @@ isAtEndUnitTests =
             SS.isAtEnd state @?= True
         ]
 
+symbols :: [String]
+symbols =
+    [ "("
+    , ")"
+    , "{"
+    , "}"
+    , ","
+    , "."
+    , "-"
+    , "+"
+    , ";"
+    , "*"
+    , "="
+    , "!"
+    , "<"
+    , ">"
+    , "/"
+    ]
+
 scanTokenUnitTests :: TestTree
 scanTokenUnitTests =
     testGroup --
         "scanToken unit tests"
-        [ testCase "Scans symbol" $ do
-            let text = T.pack "{   "
+        [ testCase "Scans symbols" $ do
+            let text = T.pack $ concat symbols
             let state = SS.ScannerState text 0 0 1 [] []
-            let result = execState SS.scanToken state
-            -- print $ SS.tokens result
-            let t = head $ SS.tokens result
-            t._type @?= TK.LEFT_BRACE
-            -- , testCase "Returns False when current is mid-text" $ do
-            --    let text = T.pack "some text"
-            --    let state = SS.ScannerState text 2 5 1 [] []
-            --    SS.isAtEnd state @?= False
-            -- , testCase "Returns True when current == length" $ do
-            --    let text = T.pack "some text"
-            --    let state = SS.ScannerState text (T.length text) (T.length text) 1 [] []
-            --    SS.isAtEnd state @?= True
-            -- , testCase "Returns True when current > length" $ do
-            --    let text = T.pack "some text"
-            --    let state = SS.ScannerState text (T.length text) (T.length text + 1) 1 [] []
-            --    SS.isAtEnd state @?= True
-            -- , testCase "Returns True for empty source text" $ do
-            --    let state = SS.ScannerState T.empty 0 0 1 [] []
-            --    SS.isAtEnd state @?= True
+            let result = execState SS.scanTokens state
+            -- mapM_ (putStrLn . show) $ result.tokens
+            length result.tokens @?= length symbols
+            result.current @?= length symbols
+            result.start @?= length symbols
+            length result.errors @?= 0
         ]
 tests :: TestTree
 tests = testGroup "Tests" [isAtEndUnitTests, scanTokenUnitTests]
