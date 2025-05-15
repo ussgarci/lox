@@ -107,19 +107,39 @@ symbols =
     , "/"
     ]
 
+whitespace :: [String]
+whitespace =
+    [ " "
+    , "\r"
+    , "\t"
+    ]
+
 scanTokenUnitTests :: TestTree
 scanTokenUnitTests =
     testGroup --
         "scanToken unit tests"
-        [ testCase "Scans symbols" $ do
-            let text = T.pack $ concat symbols
-            let state = SS.ScannerState text 0 0 1 [] []
+        [ testCase "Symbols" $ do
+            let state = SS.ScannerState (T.pack $ concat symbols) 0 0 1 [] []
             let result = execState SS.scanTokens state
             -- mapM_ (putStrLn . show) $ result.tokens
             length result.tokens @?= length symbols
             result.current @?= length symbols
             result.start @?= length symbols
             length result.errors @?= 0
+        , testCase "Whitespace" $ do
+            let state = SS.ScannerState (T.pack $ concat whitespace) 0 0 1 [] []
+            let result = execState SS.scanTokens state
+            length result.tokens @?= 0
+            result.current @?= length whitespace
+            result.start @?= length whitespace
+            length result.errors @?= 0
+        , testCase "Newlines" $ do
+            let state = SS.ScannerState (T.pack "\n\n\n") 0 0 1 [] []
+            let result = execState SS.scanTokens state
+            length result.tokens @?= 0
+            length result.errors @?= 0
+            result.line @?= 4
+            result.start @?= 3
         ]
 tests :: TestTree
 tests = testGroup "Tests" [isAtEndUnitTests, scanTokenUnitTests]

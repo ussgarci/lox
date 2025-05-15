@@ -112,12 +112,12 @@ scanToken = do
                         _ <- advance
                         skip
                     )
-        '\r' -> scanToken
-        '\t' -> scanToken
+        '\r' -> return ()
+        '\t' -> return ()
         '\n' -> do
-            modify $ \s -> s{line = line s + 1}
-            scanToken
-        ' ' -> scanToken
+            -- modify $ \s -> s{line = line s + 1}
+            return ()
+        ' ' -> return ()
         '"' -> string
         _ -> do
             _ <- logError (T.pack "Unexpected character") ln
