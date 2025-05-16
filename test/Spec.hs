@@ -140,6 +140,14 @@ scanTokenUnitTests =
             length result.errors @?= 0
             result.line @?= 4
             result.start @?= 3
+        , testCase "String literal" $ do
+            let text = "\"doggo\""
+            let state = SS.ScannerState (T.pack text) 0 0 1 [] []
+            let result = execState SS.scanTokens state
+            length result.tokens @?= 1
+            result.current @?= length text
+            result.start @?= length text
+            length result.errors @?= 0
         ]
 tests :: TestTree
 tests = testGroup "Tests" [isAtEndUnitTests, scanTokenUnitTests]

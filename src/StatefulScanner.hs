@@ -114,9 +114,7 @@ scanToken = do
                     )
         '\r' -> return ()
         '\t' -> return ()
-        '\n' -> do
-            -- modify $ \s -> s{line = line s + 1}
-            return ()
+        '\n' -> return ()
         ' ' -> return ()
         '"' -> string
         _ -> do
@@ -141,6 +139,7 @@ scanToken = do
 --   String value = source.substring(start + 1, current - 1);
 --   addToken(STRING, value);
 -- }
+
 slice :: Int -> Int -> T.Text -> T.Text
 slice a b = T.take (b - a) . T.drop a
 
@@ -148,18 +147,29 @@ string :: State ScannerState ()
 string = do
     whileM_
         ( do
-            c <- peek
             currentState <- get
-            return $ c /= '"' && isAtEnd currentState
+            if isAtEnd currentState
+                then return False -- Stop if at the end
+                else do
+                    c <- peek
+                    return (c /= '"') -- Continue if not a quote
         )
         ( do
             advance
         )
-    whenM (gets isAtEnd) $ error "AAAAAH"
-    _ <- advance
     currentState <- get
-    let val = slice (currentState.start + 1) (currentState.current - 1) currentState.source
-    addToken STRING (Just $ String val)
+    -- loop terminated with EOF
+    if isAtEnd currentState
+        then do
+            modify $ \s ->
+                s{errors = s.errors ++ [Error (T.pack "Unterminated string literal") s.line]}
+        else -- loop terminated with closing double quote
+        do
+            -- Consume closing double quote
+            _ <- advance
+            finalState <- get
+            let val = slice (finalState.start + 1) (finalState.current - 1) finalState.source
+            addToken STRING (Just $ String val)
 
 logError :: T.Text -> Int -> State ScannerState ()
 logError msg ln = do
