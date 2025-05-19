@@ -17,6 +17,7 @@ import Control.Monad.Loops (whileM_)
 import Control.Monad.State
 import qualified Data.Text as T
 import Token (TokenType (..))
+import Data.Char (isDigit)
 
 data Error = Error
     { _message :: T.Text
@@ -118,8 +119,45 @@ scanToken = do
         ' ' -> return ()
         '"' -> string
         _ -> do
-            _ <- logError (T.pack "Unexpected character") ln
-            scanToken
+            if isDigit c then number else do
+                _ <- logError (T.pack "Unexpected character") ln
+                scanToken
+
+--  private void number() {
+--    while (isDigit(peek())) advance();
+--
+--    // Look for a fractional part.
+--    if (peek() == '.' && isDigit(peekNext())) {
+--      // Consume the "."
+--      advance();
+--
+--      while (isDigit(peek())) advance();
+--    }
+--
+--    addToken(NUMBER,
+--        Double.parseDouble(source.substring(start, current)));
+--  }
+
+slice :: Int -> Int -> T.Text -> T.Text
+slice a b = T.take (b - a) . T.drop a
+
+number :: State ScannerState ()
+number = do
+    whileM_
+        ( do
+            -- c <- peek
+            -- return (isDigit c) 
+            isDigit <$> peek
+        )
+        ( do
+            advance
+        )
+    ifM
+        ( liftM2 (&&) ((== '.') <$> peek)  (isDigit <$> peekNext))
+        undefined
+        undefined
+
+
 
 -- private void string() {
 --   while (peek() != '"' && !isAtEnd()) {
@@ -139,9 +177,6 @@ scanToken = do
 --   String value = source.substring(start + 1, current - 1);
 --   addToken(STRING, value);
 -- }
-
-slice :: Int -> Int -> T.Text -> T.Text
-slice a b = T.take (b - a) . T.drop a
 
 string :: State ScannerState ()
 string = do
@@ -175,6 +210,13 @@ logError :: T.Text -> Int -> State ScannerState ()
 logError msg ln = do
     modify $ \s ->
         s{errors = s.errors ++ [Error msg ln]}
+
+peekNext :: State ScannerState Char
+peekNext = do
+    currentState <- get
+    if (currentState.current + 1) == T.length currentState.source
+        then return '\0'
+        else return $ T.index currentState.source (currentState.current + 1)
 
 peek :: State ScannerState Char
 peek = do
