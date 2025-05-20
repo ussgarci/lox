@@ -15,9 +15,10 @@ import Control.Monad (unless, when)
 import Control.Monad.Extra (ifM, notM, whenM)
 import Control.Monad.Loops (whileM_)
 import Control.Monad.State
-import qualified Data.Text as T
-import Token (TokenType (..))
 import Data.Char (isDigit)
+import qualified Data.Text as T
+import Text.Read (readMaybe)
+import Token (TokenType (..))
 
 data Error = Error
     { _message :: T.Text
@@ -119,9 +120,11 @@ scanToken = do
         ' ' -> return ()
         '"' -> string
         _ -> do
-            if isDigit c then number else do
-                _ <- logError (T.pack "Unexpected character") ln
-                scanToken
+            if isDigit c
+                then number
+                else do
+                    _ <- logError (T.pack "Unexpected character") ln
+                    scanToken
 
 --  private void number() {
 --    while (isDigit(peek())) advance();
@@ -146,18 +149,29 @@ number = do
     whileM_
         ( do
             -- c <- peek
-            -- return (isDigit c) 
+            -- return (isDigit c)
             isDigit <$> peek
         )
         ( do
             advance
         )
-    ifM
-        ( liftM2 (&&) ((== '.') <$> peek)  (isDigit <$> peekNext))
-        undefined
-        undefined
-
-
+    hasFractionalPart <- liftM2 (&&) ((== '.') <$> peek) (isDigit <$> peekNext)
+    when
+        hasFractionalPart
+        ( do
+            whileM_
+                ( do
+                    isDigit <$> peek
+                )
+                ( do
+                    advance
+                )
+        )
+    finalState <- get
+    let textVal = slice finalState.start finalState.current finalState.source
+    case readMaybe (T.unpack textVal) :: Maybe Double of
+        Just val -> addToken NUMBER (Just $ Number val)
+        Nothing -> logError (T.pack $ "Failed to convert " ++ T.unpack textVal ++ " to Double.") finalState.line
 
 -- private void string() {
 --   while (peek() != '"' && !isAtEnd()) {
