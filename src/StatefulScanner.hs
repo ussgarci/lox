@@ -260,8 +260,9 @@ addToken tt lit = do
     currState <- get
     let currTokens = currState.tokens
     let currLine = currState.line
+    let text = slice currState.start currState.current currState.source
     modify $ \s ->
-        s{tokens = currTokens ++ [Token tt (T.pack "") lit currLine]}
+        s{tokens = currTokens ++ [Token tt text lit currLine]}
     return ()
 
 match :: Char -> State ScannerState Bool

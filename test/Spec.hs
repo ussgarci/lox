@@ -148,6 +148,22 @@ scanTokenUnitTests =
             result.current @?= length text
             result.start @?= length text
             length result.errors @?= 0
+        , testCase "Number literal" $ do
+            let text = "13"
+            let state = SS.ScannerState (T.pack text) 0 0 1 [] []
+            let result = execState SS.scanTokens state
+            length result.tokens @?= 1
+            result.current @?= length text
+            result.start @?= length text
+            length result.errors @?= 0
+        , testCase "Number literal w/ fractional" $ do
+            let text = "13.13"
+            let state = SS.ScannerState (T.pack text) 0 0 1 [] []
+            let result = execState SS.scanTokens state
+            length result.tokens @?= 1
+            result.current @?= length text
+            result.start @?= length text
+            length result.errors @?= 0
         ]
 tests :: TestTree
 tests = testGroup "Tests" [isAtEndUnitTests, scanTokenUnitTests]
