@@ -160,6 +160,7 @@ scanTokenUnitTests =
             let text = "13.13"
             let state = SS.ScannerState (T.pack text) 0 0 1 [] []
             let result = execState SS.scanTokens state
+            print result.tokens
             length result.tokens @?= 1
             result.current @?= length text
             result.start @?= length text

@@ -156,9 +156,11 @@ number = do
             advance
         )
     hasFractionalPart <- liftM2 (&&) ((== '.') <$> peek) (isDigit <$> peekNext)
+
     when
         hasFractionalPart
         ( do
+            _ <- advance
             whileM_
                 ( do
                     isDigit <$> peek
