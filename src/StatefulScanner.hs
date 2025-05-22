@@ -15,7 +15,7 @@ import Control.Monad (unless, when)
 import Control.Monad.Extra (ifM, notM, whenM)
 import Control.Monad.Loops (whileM_)
 import Control.Monad.State
-import Data.Char (isDigit)
+import Data.Char (isAlpha, isAlphaNum, isDigit)
 import qualified Data.Text as T
 import Text.Read (readMaybe)
 import Token (TokenType (..))
@@ -122,9 +122,34 @@ scanToken = do
         _ -> do
             if isDigit c
                 then number
-                else do
-                    _ <- logError (T.pack "Unexpected character") ln
-                    scanToken
+                else
+                    if isAlpha c
+                        then identifier
+                        else do
+                            _ <- logError (T.pack "Unexpected character") ln
+                            scanToken
+
+--  private void identifier() {
+--    while (isAlphaNumeric(peek())) advance();
+--
+--    addToken(IDENTIFIER);
+--  }
+
+identifier :: State ScannerState ()
+identifier = do
+    whileM_
+        ( do
+            isAlphaNum <$> peek
+        )
+        ( do
+            advance
+        )
+    finalState <- get
+    let text = slice finalState.start finalState.current finalState.source
+    -- TokenType type = keywords.get(text);
+    -- if (type == null) type = IDENTIFIER;
+    -- addToken(type);
+    addToken IDENTIFIER (Just $ Identifier text)
 
 --  private void number() {
 --    while (isDigit(peek())) advance();
