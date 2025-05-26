@@ -15,7 +15,9 @@ import Control.Monad (unless, when)
 import Control.Monad.Extra (ifM, notM, whenM)
 import Control.Monad.Loops (whileM_)
 import Control.Monad.State
+import Data.Bifunctor (first)
 import Data.Char (isAlpha, isAlphaNum, isDigit)
+import qualified Data.Map as M
 import qualified Data.Text as T
 import Text.Read (readMaybe)
 import Token (TokenType (..))
@@ -46,6 +48,29 @@ data ScannerState = ScannerState
 
 data Literal = Identifier T.Text | String T.Text | Number Double
     deriving (Show, Eq)
+
+keywords :: M.Map T.Text TokenType
+keywords =
+    M.fromList $
+        map
+            (first T.pack)
+            [ ("and", AND)
+            , ("class", CLASS)
+            , ("else", ELSE)
+            , ("false", FALSE)
+            , ("for", FOR)
+            , ("fun", FUN)
+            , ("if", IF)
+            , ("nil", NIL)
+            , ("or", OR)
+            , ("print", PRINT)
+            , ("return", RETURN)
+            , ("super", SUPER)
+            , ("this", THIS)
+            , ("true", TRUE)
+            , ("var", VAR)
+            , ("while", WHILE)
+            ]
 
 isAtEnd :: ScannerState -> Bool
 isAtEnd ss = current ss >= T.length ss.source
@@ -146,10 +171,9 @@ identifier = do
         )
     finalState <- get
     let text = slice finalState.start finalState.current finalState.source
-    -- TokenType type = keywords.get(text);
-    -- if (type == null) type = IDENTIFIER;
-    -- addToken(type);
-    addToken IDENTIFIER (Just $ Identifier text)
+    case M.lookup text keywords of
+        Just tokenType -> addToken tokenType (Just $ Identifier text)
+        Nothing -> addToken IDENTIFIER (Just $ Identifier text)
 
 --  private void number() {
 --    while (isDigit(peek())) advance();
