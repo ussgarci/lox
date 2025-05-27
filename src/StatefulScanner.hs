@@ -152,7 +152,7 @@ scanToken = do
                         then identifier
                         else do
                             _ <- logError (T.pack "Unexpected character") ln
-                            scanToken
+                            return ()
 
 --  private void identifier() {
 --    while (isAlphaNumeric(peek())) advance();
@@ -172,7 +172,7 @@ identifier = do
     finalState <- get
     let text = slice finalState.start finalState.current finalState.source
     case M.lookup text keywords of
-        Just tokenType -> addToken tokenType (Just $ Identifier text)
+        Just tokenType -> addToken tokenType Nothing
         Nothing -> addToken IDENTIFIER (Just $ Identifier text)
 
 --  private void number() {

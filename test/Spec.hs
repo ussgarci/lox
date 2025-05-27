@@ -8,6 +8,7 @@ import qualified StatefulScanner as SS
 import Test.Tasty
 import Test.Tasty.HUnit
 import Text.Megaparsec
+import Token (Token (_lexeme))
 import qualified Token as TK
 
 main :: IO ()
@@ -160,11 +161,23 @@ scanTokenUnitTests =
             let text = "13.13"
             let state = SS.ScannerState (T.pack text) 0 0 1 [] []
             let result = execState SS.scanTokens state
-            print result.tokens
             length result.tokens @?= 1
             result.current @?= length text
             result.start @?= length text
             length result.errors @?= 0
+        , testCase "Reserved word" $ do
+            let text = "for"
+            let state = SS.ScannerState (T.pack text) 0 0 1 [] []
+            let result = execState SS.scanTokens state
+            (head result.tokens)._type @?= TK.FOR
+            result.current @?= length text
+            result.start @?= length text
+        , testCase "Identifier" $ do
+            let text = T.pack "fortasse"
+            let state = SS.ScannerState text 0 0 1 [] []
+            let result = execState SS.scanTokens state
+            (head result.tokens)._type @?= TK.IDENTIFIER
+            (head result.tokens)._lexeme @?= text
         ]
 tests :: TestTree
 tests = testGroup "Tests" [isAtEndUnitTests, scanTokenUnitTests]
