@@ -3,13 +3,25 @@ module AstPrinter (
 )
 where
 
-import qualified Expr as E
+import Expr
+import StatefulScanner (Literal (..))
+import Token (TokenType (MINUS, STAR))
 import Prelude
 
-testExpr :: E.Expr
-testExpr = E.Bin E.Plus (E.Lit (E.Number 5)) (E.Lit (E.Number 3))
+testExpr :: Expr
+testExpr =
+    Binary
+        { left =
+            Unary
+                { operator = MINUS
+                , right = Literal{value = Number 123.0}
+                }
+        , operator = STAR
+        , right =
+            Grouping
+                { expression = Literal{value = Number 45.67}
+                }
+        }
 
-ppExpr :: E.Expr -> String
-ppExpr (E.Lit lit) = show lit
-ppExpr (E.Una op x) = show op ++ "(" ++ ppExpr x ++ ")"
-ppExpr (E.Bin op l r) = "(" ++ ppExpr l ++ " " ++ show op ++ " " ++ ppExpr r ++ ")"
+ppExpr :: Expr -> String
+ppExpr = undefined

@@ -5,6 +5,7 @@
 module StatefulScanner (
     ScannerState (..),
     Token (..),
+    Literal (..),
     scanTokens,
     scanToken,
     isAtEnd,
