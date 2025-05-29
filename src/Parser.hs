@@ -1,10 +1,16 @@
-module Expr (
-    Expr (..),
+module Parser (
+    Parser (..),
 )
 where
 
-import StatefulScanner (Literal)
-import Token (TokenType)
+import Expr
+import StatefulScanner (Token)
+
+data ParserState = ParserState
+    { current :: Int
+    , tokens :: [Token]
+    }
+    deriving (Show)
 
 -- expression     → literal
 --                | unary
@@ -18,9 +24,5 @@ import Token (TokenType)
 -- operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
 --                | "+"  | "-"  | "*" | "/" ;
 
-data Expr
-    = Binary {operator :: TokenType, left :: Expr, right :: Expr}
-    | Grouping {expression :: Expr}
-    | Literal {value :: Literal}
-    | Unary {operator :: TokenType, right :: Expr}
-    deriving (Show, Eq)
+parse :: State ParserState Expr
+parse = undefined
