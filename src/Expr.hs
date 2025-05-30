@@ -6,18 +6,6 @@ where
 import StatefulScanner (Literal)
 import Token (TokenType)
 
--- expression     → literal
---                | unary
---                | binary
---                | grouping ;
---
--- literal        → NUMBER | STRING | "true" | "false" | "nil" ;
--- grouping       → "(" expression ")" ;
--- unary          → ( "-" | "!" ) expression ;
--- binary         → expression operator expression ;
--- operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
---                | "+"  | "-"  | "*" | "/" ;
-
 data Expr
     = Binary {operator :: TokenType, left :: Expr, right :: Expr}
     | Grouping {expression :: Expr}
