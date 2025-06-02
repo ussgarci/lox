@@ -1,10 +1,11 @@
 module Parser (
-    Parser (..),
+    parse
 )
 where
 
 import Expr
 import StatefulScanner (Token)
+import Control.Monad.State
 
 data ParserState = ParserState
     { current :: Int
