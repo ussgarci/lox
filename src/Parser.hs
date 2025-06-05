@@ -6,8 +6,10 @@ module Parser (
 )
 where
 
+import Control.Monad.Loops (whileM_)
 import Control.Monad.State
 import StatefulScanner (Token)
+import Token (TokenType (..))
 
 data ParserState = ParserState
     { current :: Int
@@ -43,5 +45,32 @@ parse = do
 expression :: Parser Expr
 expression = equality
 
+-- equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+-- private Expr equality() {
+--   Expr expr = comparison();
+
+--   while (match(BANG_EQUAL, EQUAL_EQUAL)) {
+--     Token operator = previous();
+--     Expr right = comparison();
+--     expr = new Expr.Binary(expr, operator, right);
+--   }
+
+--   return expr;
+-- }
 equality :: Parser Expr
-equality = undefined
+equality = do
+    let expr = comparison
+    whileM_
+        ( do
+            match BANG_EQUAL EQUAL_EQUAL
+        )
+        ( do
+            undefined
+        )
+    undefined
+
+comparison :: Parser Expr
+comparison = undefined
+
+match :: TokenType -> TokenType -> Parser Bool
+match = undefined
