@@ -33,11 +33,15 @@ deriving instance Show Expr
 -- primary        → NUMBER | STRING | "true" | "false" | "nil"
 --                | "(" expression ")" ;
 
-parse :: State ParserState Expr
-parse = undefined
+type Parser a = State ParserState a
 
-expression :: State ParserState Expr
-expression = undefined
+parse :: Parser Expr
+parse = do
+    expr <- expression
+    undefined
 
-equality :: State ParserState Expr
+expression :: Parser Expr
+expression = equality
+
+equality :: Parser Expr
 equality = undefined
