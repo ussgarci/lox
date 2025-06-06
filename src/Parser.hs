@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE StandaloneDeriving #-}
 
 module Parser (
@@ -65,6 +66,7 @@ equality = do
             match BANG_EQUAL EQUAL_EQUAL
         )
         ( do
+            operator <- previous
             undefined
         )
     undefined
@@ -74,3 +76,10 @@ comparison = undefined
 
 match :: TokenType -> TokenType -> Parser Bool
 match = undefined
+
+-- return tokens.get(current - 1);
+previous :: Parser Token
+previous = do
+    currentState <- get
+    let prev = currentState.tokens !! (currentState.current - 1)
+    return prev
