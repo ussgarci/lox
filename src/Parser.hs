@@ -63,7 +63,7 @@ equality = do
     let expr = comparison
     whileM_
         ( do
-            match BANG_EQUAL EQUAL_EQUAL
+            match [BANG_EQUAL, EQUAL_EQUAL]
         )
         ( do
             operator <- previous
@@ -74,10 +74,42 @@ equality = do
 comparison :: Parser Expr
 comparison = undefined
 
-match :: TokenType -> TokenType -> Parser Bool
+--  private boolean check(TokenType type) {
+--    if (isAtEnd()) return false;
+--    return peek().type == type;
+--  }
+check :: TokenType -> Parser Bool
+check = do
+    undefined
+
+--  private boolean match(TokenType... types) {
+--    for (TokenType type : types) {
+--      if (check(type)) {
+--        advance();
+--        return true;
+--      }
+--    }
+--
+--    return false;
+--  }
+match :: [TokenType] -> Parser Bool
 match = undefined
 
--- return tokens.get(current - 1);
+--  private boolean isAtEnd() {
+--    return peek().type == EOF;
+--  }
+isAtEnd :: Parser Bool
+isAtEnd = undefined
+
+--  private Token peek() {
+--    return tokens.get(current);
+--  }
+peek :: Parser Token
+peek = undefined
+
+--  private Token previous() {
+--    return tokens.get(current - 1);
+--  }
 previous :: Parser Token
 previous = do
     currentState <- get
