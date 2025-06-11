@@ -9,7 +9,7 @@ where
 
 import Control.Monad.Loops (whileM_)
 import Control.Monad.State
-import StatefulScanner (Token)
+import StatefulScanner (Token (..))
 import Token (TokenType (..))
 
 data ParserState = ParserState
@@ -99,13 +99,17 @@ match = undefined
 --    return peek().type == EOF;
 --  }
 isAtEnd :: Parser Bool
-isAtEnd = undefined
+isAtEnd = do
+    token <- peek
+    return $ token._type == EOF
 
 --  private Token peek() {
 --    return tokens.get(current);
 --  }
 peek :: Parser Token
-peek = undefined
+peek = do
+    cs <- get
+    return $ cs.tokens !! cs.current
 
 --  private Token previous() {
 --    return tokens.get(current - 1);
