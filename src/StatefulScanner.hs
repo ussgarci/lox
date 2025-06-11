@@ -89,6 +89,8 @@ scanTokens = go
                 scanToken
                 go
             )
+        -- tokens.add(new Token(EOF, "", null, line));
+        addToken EOF Nothing
 
 scanToken :: State ScannerState ()
 scanToken = do
