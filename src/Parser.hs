@@ -74,6 +74,10 @@ equality = do
 comparison :: Parser Expr
 comparison = undefined
 
+
+term :: Parser Expr
+term = undefined
+
 --  private boolean check(TokenType type) {
 --    if (isAtEnd()) return false;
 --    return peek().type == type;
