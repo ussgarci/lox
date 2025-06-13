@@ -60,20 +60,21 @@ expression = equality
 -- }
 equality :: Parser Expr
 equality = do
-    let expr = comparison
+    expr <- comparison
     whileM_
         ( do
             match [BANG_EQUAL, EQUAL_EQUAL]
         )
         ( do
             operator <- previous
+            right <- comparison
+            -- expr = new Expr.Binary(expr, operator, right);
             undefined
         )
-    undefined
+    return expr
 
 comparison :: Parser Expr
 comparison = undefined
-
 
 term :: Parser Expr
 term = undefined
