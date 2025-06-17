@@ -41,8 +41,7 @@ type Parser a = State ParserState a
 
 parse :: Parser Expr
 parse = do
-    expr <- expression
-    undefined
+    expression
 
 expression :: Parser Expr
 expression = equality
