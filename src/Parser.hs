@@ -7,6 +7,7 @@ module Parser (
 )
 where
 
+import Control.Monad.Extra (ifM, notM, whenM)
 import Control.Monad.Loops (whileM_)
 import Control.Monad.State
 import StatefulScanner (Token (..))
@@ -74,7 +75,51 @@ equality = do
     return expr
 
 comparison :: Parser Expr
-comparison = undefined
+comparison = do
+    expr <- term
+    whileM_
+        ( do
+            match [MINUS, PLUS]
+        )
+        ( do
+            operator <- previous
+            right <- factor
+            -- expr = new Expr.Binary(expr, operator, right);
+            undefined
+        )
+    return expr
+
+factor :: Parser Expr
+factor = do
+    expr <- unary
+    whileM_
+        ( do
+            match [SLASH, STAR]
+        )
+        ( do
+            operator <- previous
+            right <- unary
+            -- expr = new Expr.Binary(expr, operator, right);
+            undefined
+        )
+    return expr
+
+unary :: Parser Expr
+unary = do
+    ifM
+        (match [BANG, MINUS])
+        ( do
+            operator <- previous
+            right <- unary
+            -- expr = new Expr.Unary(operator, right);
+            undefined
+        )
+        ( do
+            primary
+        )
+
+primary :: Parser Expr
+primary = undefined
 
 term :: Parser Expr
 term = undefined
