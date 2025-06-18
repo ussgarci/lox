@@ -73,6 +73,7 @@ equality = do
         )
     return expr
 
+-- comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
 comparison :: Parser Expr
 comparison = do
     expr <- term
