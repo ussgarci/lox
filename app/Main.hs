@@ -41,12 +41,3 @@ main = do
             print $ SS.tokens result
         [] -> runPrompt
         _ -> putStrLn "Usage: lox [script]"
-
--- main :: IO ()
--- main = do
---     args <- getArgs
---     print args
---     case args of
---         [fname] -> runFile fname
---         [] -> runPrompt
---         _ -> putStrLn "Usage: lox [script]"
