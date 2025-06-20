@@ -12,9 +12,9 @@ import qualified StatefulScanner as SS
 
 runFile :: FilePath -> IO ()
 runFile fname = do
-    f <- readFile fname
-    result <- MT.scan f
-    print result
+    contents <- readFile fname
+    let result = execState SS.scanTokens (SS.ScannerState (T.pack contents) 0 0 1 [] [])
+    print $ SS.tokens result
 
 runPrompt :: IO ()
 runPrompt = go
@@ -34,10 +34,6 @@ main = do
     args <- getArgs
     print args
     case args of
-        [fname] -> do
-            contents <- readFile fname
-            -- let result = evalState SS.scanTokens (SS.ScannerState (T.pack contents) 0 0 1 [])
-            let result = execState SS.scanTokens (SS.ScannerState (T.pack contents) 0 0 1 [] [])
-            print $ SS.tokens result
+        [fname] -> runFile fname
         [] -> runPrompt
         _ -> putStrLn "Usage: lox [script]"
