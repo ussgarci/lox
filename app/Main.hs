@@ -14,8 +14,8 @@ runFile fname = do
     let result = execState SS.scanTokens (SS.ScannerState (T.pack contents) 0 0 1 [] [])
     print $ SS.tokens result
 
-runPrompt :: IO ()
-runPrompt = go
+scannerPrompt :: IO ()
+scannerPrompt = go
   where
     go = do
         ended <- isEOF
@@ -28,11 +28,14 @@ runPrompt = go
                 go
             )
 
+parserPrompt :: IO ()
+parserPrompt = undefined
+
 main :: IO ()
 main = do
     args <- getArgs
-    print args
     case args of
+        ["-s"] -> scannerPrompt
+        ["-p"] -> parserPrompt
         [fname] -> runFile fname
-        [] -> runPrompt
-        _ -> putStrLn "Usage: lox [script]"
+        _ -> putStrLn "Usage: lox [script] | -s | -p"
