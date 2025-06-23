@@ -23,7 +23,8 @@ runPrompt = go
             ended
             ( do
                 input <- getLine
-                putStrLn input
+                let result = execState SS.scanTokens (SS.ScannerState (T.pack input) 0 0 1 [] [])
+                print $ SS.tokens result
                 go
             )
 
