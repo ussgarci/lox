@@ -6,7 +6,6 @@ import qualified Data.Text as T
 import System.Environment (getArgs)
 import System.IO (isEOF)
 
-import qualified MegaScanner as MT
 import qualified StatefulScanner as SS
 
 runFile :: FilePath -> IO ()
