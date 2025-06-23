@@ -37,6 +37,9 @@ common extra
 common monad-loops
   build-depends: monad-loops == 0.4.3
 
+common optparse-applicative
+  build-depends: optparse-applicative >=0.16 && <0.19
+
 library 
   exposed-modules:
       MegaScanner
@@ -69,6 +72,7 @@ executable lox-exe
     , megaparsec
     , mtl
     , text
+    , optparse-applicative
   default-language: Haskell2010
 
 test-suite lox-test
