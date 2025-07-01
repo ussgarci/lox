@@ -81,16 +81,12 @@ scanTokens = go
   where
     go = do
         currentState <- get
-        let ended = isAtEnd currentState
-        modify $ \s -> s{start = s.current}
-        Control.Monad.unless
-            ended
-            ( do
+        if isAtEnd currentState
+            then addToken EOF Nothing
+            else do
+                modify $ \s -> s{start = s.current}
                 scanToken
                 go
-            )
-        -- tokens.add(new Token(EOF, "", null, line));
-        addToken EOF Nothing
 
 scanToken :: State ScannerState ()
 scanToken = do
