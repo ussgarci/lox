@@ -7,7 +7,6 @@ module Parser (
 )
 where
 
-import Control.Monad.Extra (ifM, notM, whenM)
 import Control.Monad.Loops (whileM_)
 import Control.Monad.State
 import StatefulScanner (Token (..))
