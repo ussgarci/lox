@@ -7,6 +7,7 @@ module Parser (
 )
 where
 
+import Control.Monad.Extra (ifM)
 import Control.Monad.Loops (whileM_)
 import Control.Monad.State
 import StatefulScanner (Token (..))
@@ -46,17 +47,6 @@ expression :: Parser Expr
 expression = equality
 
 -- equality       → comparison ( ( "!=" | "==" ) comparison )* ;
--- private Expr equality() {
---   Expr expr = comparison();
-
---   while (match(BANG_EQUAL, EQUAL_EQUAL)) {
---     Token operator = previous();
---     Expr right = comparison();
---     expr = new Expr.Binary(expr, operator, right);
---   }
-
---   return expr;
--- }
 equality :: Parser Expr
 equality = do
     expr <- comparison
@@ -66,9 +56,7 @@ equality = do
         )
         ( do
             operator <- previous
-            right <- comparison
-            -- expr = new Expr.Binary(expr, operator, right);
-            undefined
+            return $ Binary expr operator <$> comparison
         )
     return expr
 
@@ -78,13 +66,25 @@ comparison = do
     expr <- term
     whileM_
         ( do
-            match [MINUS, PLUS]
+            match [GREATER, GREATER_EQUAL, LESS, LESS_EQUAL]
         )
         ( do
             operator <- previous
             right <- factor
-            -- expr = new Expr.Binary(expr, operator, right);
-            undefined
+            return $ Binary expr operator <$> right
+        )
+    return expr
+
+term :: Parser Expr
+term = do
+    expr <- factor
+    whileM_
+        ( do
+            match [MINUS, PLUS]
+        )
+        ( do
+            operator <- previous
+            return $ Binary expr operator <$> factor
         )
     return expr
 
@@ -97,9 +97,7 @@ factor = do
         )
         ( do
             operator <- previous
-            right <- unary
-            -- expr = new Expr.Binary(expr, operator, right);
-            undefined
+            return $ Binary expr operator <$> unary
         )
     return expr
 
@@ -109,9 +107,7 @@ unary = do
         (match [BANG, MINUS])
         ( do
             operator <- previous
-            right <- unary
-            -- expr = new Expr.Unary(operator, right);
-            undefined
+            Unary operator <$> unary
         )
         ( do
             primary
@@ -119,9 +115,6 @@ unary = do
 
 primary :: Parser Expr
 primary = undefined
-
-term :: Parser Expr
-term = undefined
 
 --  private boolean check(TokenType type) {
 --    if (isAtEnd()) return false;
