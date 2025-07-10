@@ -2,7 +2,7 @@
 
 A Haskell implementation of the `lox` language from [Crafting Interpreters](https://craftinginterpreters.com/). 
 
-This repo is monitored by [:bee: Beeminder](https://www.beeminder.com/ussgarci/learn-haskell) to keep me accountable for my learning goals.
+~~This repo is monitored by [:bee: Beeminder](https://www.beeminder.com/ussgarci/learn-haskell) to keep me accountable for my learning goals.~~
 
 #### Building
 ```
