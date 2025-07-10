@@ -7,7 +7,7 @@ module Parser (
 )
 where
 
-import Control.Monad.Extra (ifM)
+import Control.Monad.Extra (ifM, whenM)
 import Control.Monad.Loops (whileM_)
 import Control.Monad.State
 import StatefulScanner (Token (..))
@@ -34,7 +34,7 @@ deriving instance Show Expr
 -- factor         → unary ( ( "/" | "*" ) unary )* ;
 -- unary          → ( "!" | "-" ) unary
 --                | primary ;
--- primary        → NUMBER | STRING | "true" | "false" | "nil"
+-- primary        → number | string | "true" | "false" | "nil"
 --                | "(" expression ")" ;
 
 type Parser a = State ParserState a
@@ -75,6 +75,7 @@ comparison = do
         )
     return expr
 
+-- term           → factor ( ( "-" | "+" ) factor )* ;
 term :: Parser Expr
 term = do
     expr <- factor
@@ -101,6 +102,8 @@ factor = do
         )
     return expr
 
+-- unary          → ( "!" | "-" ) unary
+--                | primary ;
 unary :: Parser Expr
 unary = do
     ifM
@@ -113,16 +116,46 @@ unary = do
             primary
         )
 
+-- primary        → number | string | "true" | "false" | "nil"
+--                | "(" expression ")" ;
 primary :: Parser Expr
-primary = undefined
+primary = do
+    currentToken <- advance
+    case currentToken._type of
+        NUMBER -> return $ Literal currentToken
+        STRING -> return $ Literal currentToken
+        FALSE -> return $ Literal currentToken
+        TRUE -> return $ Literal currentToken
+        NIL -> return $ Literal currentToken
+        LEFT_PAREN -> do
+            _ <- advance
+            expr <- expression
+            _ <- advance
+            return $ Grouping expr
+        _ -> error $ "Unexpected token in primary: " ++ show currentToken
+
+-- private Token advance() {
+--   if (!isAtEnd()) current++;
+--   return previous();
+-- }
+advance :: Parser Token
+advance = do
+    whenM (not <$> isAtEnd) (do modify $ \s -> s{current = s.current + 1})
+    previous
 
 --  private boolean check(TokenType type) {
 --    if (isAtEnd()) return false;
 --    return peek().type == type;
 --  }
 check :: TokenType -> Parser Bool
-check = do
-    undefined
+check tt = do
+    ifM
+        isAtEnd
+        (return False)
+        ( do
+            token <- peek
+            return $ token._type == tt
+        )
 
 --  private boolean match(TokenType... types) {
 --    for (TokenType type : types) {
@@ -135,7 +168,15 @@ check = do
 --    return false;
 --  }
 match :: [TokenType] -> Parser Bool
-match = undefined
+match [] = return False
+match (t : ts) = do
+    ifM
+        (check t)
+        ( do
+            _ <- advance
+            return True
+        )
+        (match ts)
 
 --  private boolean isAtEnd() {
 --    return peek().type == EOF;
