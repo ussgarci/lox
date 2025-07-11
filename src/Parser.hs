@@ -70,8 +70,7 @@ comparison = do
         )
         ( do
             operator <- previous
-            right <- factor
-            return $ Binary expr operator <$> right
+            return $ Binary expr operator <$> factor
         )
     return expr
 
