@@ -1,13 +1,14 @@
 module Main (main) where
 
 import Control.Monad (unless)
-import Control.Monad.State (execState)
+import Control.Monad.State (evalState, execState)
 import Data.Maybe (fromMaybe)
 import qualified Data.Text as T
 import System.IO (isEOF)
 
 import Options.Applicative
 
+import qualified Parser as P
 import qualified StatefulScanner as SS
 
 data Command
@@ -39,7 +40,22 @@ scannerPrompt = go
             )
 
 parserPrompt :: IO ()
-parserPrompt = putStrLn "Parser not yet implemented."
+parserPrompt = go
+  where
+    go = do
+        putStr "> "
+        ended <- isEOF
+        unless
+            ended
+            ( do
+                input <- getLine
+                unless (null input) $ do
+                    let result = execState SS.scanTokens (SS.ScannerState (T.pack input) 0 0 1 [] [])
+                    -- TODO: lexeme is incorrect for EOF
+                    let expr = evalState P.parse (P.ParserState 0 (SS.tokens result))
+                    print expr
+                go
+            )
 
 scannerP :: Parser Command
 scannerP =

@@ -4,6 +4,7 @@
 
 module Parser (
     parse,
+    ParserState (..),
 )
 where
 
